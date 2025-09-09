@@ -30,6 +30,8 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/profit_ma
 // 路由
 app.use('/api/profits', require('./routes/profits'));
 app.use('/api/departments', require('./routes/departments'));
+app.use('/api/research', require('./routes/research'));
+app.use('/api/channels', require('./routes/channels'));
 app.use('/api/upload', require('./routes/upload'));
 
 // 静态文件服务

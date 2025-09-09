@@ -10,6 +10,8 @@ import {
   FileTextOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  ExperimentOutlined,
+  ShopOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -39,6 +41,16 @@ const Sidebar: React.FC = () => {
       key: '/departments',
       icon: <TeamOutlined />,
       label: '部门管理',
+    },
+    {
+      key: '/research',
+      icon: <ExperimentOutlined />,
+      label: '研发管理',
+    },
+    {
+      key: '/channels',
+      icon: <ShopOutlined />,
+      label: '渠道管理',
     },
     {
       key: '/import',

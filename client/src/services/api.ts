@@ -80,6 +80,48 @@ export const departmentApi = {
   deleteDepartment: (id: string) => api.delete(`/departments/${id}`),
 };
 
+// 研发管理相关API
+export const researchApi = {
+  // 获取研发项目列表
+  getResearchProjects: (params?: any) => api.get('/research', { params }),
+  
+  // 获取单个研发项目
+  getResearchProject: (id: string) => api.get(`/research/${id}`),
+  
+  // 创建研发项目
+  createResearchProject: (data: any) => api.post('/research', data),
+  
+  // 更新研发项目
+  updateResearchProject: (id: string, data: any) => api.put(`/research/${id}`, data),
+  
+  // 删除研发项目
+  deleteResearchProject: (id: string) => api.delete(`/research/${id}`),
+  
+  // 获取研发项目统计
+  getResearchStats: (params?: any) => api.get('/research/stats', { params }),
+};
+
+// 渠道管理相关API
+export const channelApi = {
+  // 获取渠道列表
+  getChannels: (params?: any) => api.get('/channels', { params }),
+  
+  // 获取单个渠道
+  getChannel: (id: string) => api.get(`/channels/${id}`),
+  
+  // 创建渠道
+  createChannel: (data: any) => api.post('/channels', data),
+  
+  // 更新渠道
+  updateChannel: (id: string, data: any) => api.put(`/channels/${id}`, data),
+  
+  // 删除渠道
+  deleteChannel: (id: string) => api.delete(`/channels/${id}`),
+  
+  // 获取渠道统计
+  getChannelStats: (params?: any) => api.get('/channels/stats', { params }),
+};
+
 // 文件上传相关API
 export const uploadApi = {
   // 上传Excel文件
