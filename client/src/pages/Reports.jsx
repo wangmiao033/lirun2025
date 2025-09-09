@@ -36,7 +36,7 @@ const Reports = () => {
       const response = await fetch('/api/export', {
         method: 'GET',
         headers: {
-          'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv, */*'
         }
       });
       
@@ -48,10 +48,23 @@ const Reports = () => {
           throw new Error('导出的文件为空');
         }
         
+        // 根据Content-Type确定文件扩展名
+        const contentType = response.headers.get('content-type');
+        let fileExtension = '.xlsx';
+        let fileName = '项目数据';
+        
+        if (contentType && contentType.includes('text/csv')) {
+          fileExtension = '.csv';
+          fileName = '项目数据';
+        } else if (contentType && contentType.includes('spreadsheetml')) {
+          fileExtension = '.xlsx';
+          fileName = '项目数据';
+        }
+        
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `项目数据_${new Date().toISOString().split('T')[0]}.xlsx`;
+        a.download = `${fileName}_${new Date().toISOString().split('T')[0]}${fileExtension}`;
         a.style.display = 'none';
         document.body.appendChild(a);
         a.click();
@@ -62,7 +75,8 @@ const Reports = () => {
           document.body.removeChild(a);
         }, 100);
         
-        alert('导出成功！');
+        const formatText = fileExtension === '.csv' ? 'CSV' : 'Excel';
+        alert(`${formatText}文件导出成功！`);
       } else {
         const errorText = await response.text();
         console.error('导出失败:', response.status, errorText);

@@ -1403,6 +1403,7 @@ app.get('/api/statistics', (req, res) => {
 app.get('/api/export', (req, res) => {
   try {
     console.log('开始导出数据，项目数量:', projects.length);
+    console.log('xlsx模块状态:', typeof xlsx);
     
     if (!projects || projects.length === 0) {
       return res.status(400).json({
@@ -1435,24 +1436,83 @@ app.get('/api/export', (req, res) => {
     
     console.log('准备导出数据:', exportData.length, '条记录');
     
-    const worksheet = xlsx.utils.json_to_sheet(exportData);
-    const workbook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(workbook, worksheet, '项目数据');
+    // 尝试使用xlsx模块导出Excel
+    if (xlsx && xlsx.utils) {
+      try {
+        console.log('使用xlsx模块导出Excel');
+        
+        // 创建Excel工作表
+        const worksheet = xlsx.utils.json_to_sheet(exportData);
+        console.log('工作表创建成功');
+        
+        // 创建工作簿
+        const workbook = xlsx.utils.book_new();
+        console.log('工作簿创建成功');
+        
+        // 添加工作表到工作簿
+        xlsx.utils.book_append_sheet(workbook, worksheet, '项目数据');
+        console.log('工作表添加到工作簿成功');
+        
+        // 生成Excel文件缓冲区
+        const buffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+        console.log('Excel文件生成成功，大小:', buffer.length, 'bytes');
+        
+        // 设置响应头
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=项目数据.xlsx');
+        res.setHeader('Content-Length', buffer.length);
+        
+        // 发送文件
+        res.send(buffer);
+        console.log('Excel文件发送完成');
+        return;
+        
+      } catch (xlsxError) {
+        console.error('xlsx导出失败，尝试CSV导出:', xlsxError);
+        // 如果xlsx失败，继续使用CSV导出
+      }
+    }
     
-    const buffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+    // 备用方案：导出CSV格式
+    console.log('使用CSV格式导出');
     
-    console.log('Excel文件生成成功，大小:', buffer.length, 'bytes');
+    // 获取所有字段名
+    const headers = Object.keys(exportData[0] || {});
     
-    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=项目数据.xlsx');
-    res.setHeader('Content-Length', buffer.length);
-    res.send(buffer);
+    // 创建CSV内容
+    let csvContent = '\uFEFF'; // BOM for UTF-8
+    csvContent += headers.join(',') + '\n';
+    
+    exportData.forEach(row => {
+      const values = headers.map(header => {
+        const value = row[header];
+        // 处理包含逗号或引号的值
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          return '"' + value.replace(/"/g, '""') + '"';
+        }
+        return value;
+      });
+      csvContent += values.join(',') + '\n';
+    });
+    
+    console.log('CSV文件生成成功，大小:', csvContent.length, 'bytes');
+    
+    // 设置响应头
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename=项目数据.csv');
+    res.setHeader('Content-Length', Buffer.byteLength(csvContent, 'utf8'));
+    
+    // 发送文件
+    res.send(csvContent);
+    console.log('CSV文件发送完成');
     
   } catch (error) {
-    console.error('导出失败:', error);
+    console.error('导出失败详细错误:', error);
+    console.error('错误堆栈:', error.stack);
     res.status(500).json({
       success: false,
-      message: '导出失败: ' + error.message
+      message: '导出失败: ' + error.message,
+      error: process.env.NODE_ENV === 'development' ? error.stack : undefined
     });
   }
 });
