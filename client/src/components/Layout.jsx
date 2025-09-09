@@ -28,6 +28,16 @@ const Layout = ({ children }) => {
       label: '银行资金',
     },
     {
+      key: '/prepayments',
+      icon: '💳',
+      label: '预付款管理',
+    },
+    {
+      key: '/advertising',
+      icon: '📢',
+      label: '广告费管理',
+    },
+    {
       key: '/departments',
       icon: '🏢',
       label: '部门管理',

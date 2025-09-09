@@ -192,6 +192,127 @@ let fundFlows = [
   }
 ];
 
+// 模拟数据库 - 预付款数据
+let prepayments = [
+  {
+    id: 1,
+    prepaymentName: '阿里云服务器预付费',
+    vendor: '阿里云',
+    amount: 50000,
+    paidAmount: 50000,
+    remainingAmount: 0,
+    prepaymentDate: '2024-01-01',
+    expiryDate: '2024-12-31',
+    status: '已用完',
+    project: '王者荣耀',
+    description: '阿里云ECS服务器年度预付费',
+    usageRecords: [
+      { date: '2024-01-01', amount: 5000, description: '服务器费用' },
+      { date: '2024-02-01', amount: 5000, description: '服务器费用' },
+      { date: '2024-03-01', amount: 5000, description: '服务器费用' }
+    ]
+  },
+  {
+    id: 2,
+    prepaymentName: '腾讯云广告预付费',
+    vendor: '腾讯云',
+    amount: 100000,
+    paidAmount: 100000,
+    remainingAmount: 30000,
+    prepaymentDate: '2024-06-01',
+    expiryDate: '2025-05-31',
+    status: '使用中',
+    project: '和平精英',
+    description: '腾讯云广告投放预付费',
+    usageRecords: [
+      { date: '2024-06-01', amount: 20000, description: '广告投放' },
+      { date: '2024-07-01', amount: 25000, description: '广告投放' },
+      { date: '2024-08-01', amount: 25000, description: '广告投放' }
+    ]
+  },
+  {
+    id: 3,
+    prepaymentName: '华为云存储预付费',
+    vendor: '华为云',
+    amount: 20000,
+    paidAmount: 20000,
+    remainingAmount: 20000,
+    prepaymentDate: '2024-11-01',
+    expiryDate: '2025-10-31',
+    status: '未使用',
+    project: '测试环境',
+    description: '华为云对象存储预付费',
+    usageRecords: []
+  }
+];
+
+// 模拟数据库 - 广告费数据
+let advertisingFees = [
+  {
+    id: 1,
+    campaignName: '王者荣耀春节推广',
+    platform: '腾讯广告',
+    adType: '信息流广告',
+    targetAudience: '18-35岁游戏用户',
+    budget: 50000,
+    spent: 45000,
+    remaining: 5000,
+    startDate: '2024-01-20',
+    endDate: '2024-02-20',
+    status: '进行中',
+    project: '王者荣耀',
+    impressions: 1000000,
+    clicks: 50000,
+    conversions: 5000,
+    ctr: 5.0,
+    cpc: 0.9,
+    cpa: 9.0,
+    description: '春节期间的王者荣耀推广活动'
+  },
+  {
+    id: 2,
+    campaignName: '和平精英夏日活动',
+    platform: '字节跳动',
+    adType: '视频广告',
+    targetAudience: '16-30岁手游用户',
+    budget: 80000,
+    spent: 60000,
+    remaining: 20000,
+    startDate: '2024-07-01',
+    endDate: '2024-08-31',
+    status: '进行中',
+    project: '和平精英',
+    impressions: 2000000,
+    clicks: 80000,
+    conversions: 8000,
+    ctr: 4.0,
+    cpc: 0.75,
+    cpa: 7.5,
+    description: '夏日主题的和平精英推广活动'
+  },
+  {
+    id: 3,
+    campaignName: '新游戏预热推广',
+    platform: '百度推广',
+    adType: '搜索广告',
+    targetAudience: '游戏爱好者',
+    budget: 30000,
+    spent: 30000,
+    remaining: 0,
+    startDate: '2024-09-01',
+    endDate: '2024-09-30',
+    status: '已完成',
+    project: '新游戏',
+    impressions: 500000,
+    clicks: 25000,
+    conversions: 2500,
+    ctr: 5.0,
+    cpc: 1.2,
+    cpa: 12.0,
+    description: '新游戏上线前的预热推广'
+  }
+];
+
 // 获取所有项目数据
 app.get('/api/projects', (req, res) => {
   res.json({
@@ -590,6 +711,194 @@ app.post('/api/fund-flows', (req, res) => {
   });
 });
 
+// 预付款管理API
+app.get('/api/prepayments', (req, res) => {
+  res.json({
+    success: true,
+    data: prepayments,
+    total: prepayments.length
+  });
+});
+
+app.post('/api/prepayments', (req, res) => {
+  const {
+    prepaymentName, vendor, amount, prepaymentDate, expiryDate, project, description
+  } = req.body;
+  
+  if (!prepaymentName || !vendor || !amount) {
+    return res.status(400).json({
+      success: false,
+      message: '缺少必填字段'
+    });
+  }
+  
+  const newPrepayment = {
+    id: prepayments.length + 1,
+    prepaymentName,
+    vendor,
+    amount: parseFloat(amount),
+    paidAmount: parseFloat(amount),
+    remainingAmount: parseFloat(amount),
+    prepaymentDate: prepaymentDate || new Date().toISOString().split('T')[0],
+    expiryDate: expiryDate || '',
+    status: '未使用',
+    project: project || '',
+    description: description || '',
+    usageRecords: []
+  };
+  
+  prepayments.push(newPrepayment);
+  
+  res.json({
+    success: true,
+    data: newPrepayment,
+    message: '预付款创建成功'
+  });
+});
+
+app.put('/api/prepayments/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const prepaymentIndex = prepayments.findIndex(p => p.id === id);
+  
+  if (prepaymentIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '预付款不存在'
+    });
+  }
+  
+  prepayments[prepaymentIndex] = {
+    ...prepayments[prepaymentIndex],
+    ...req.body,
+    amount: parseFloat(req.body.amount) || prepayments[prepaymentIndex].amount
+  };
+  
+  res.json({
+    success: true,
+    data: prepayments[prepaymentIndex],
+    message: '预付款更新成功'
+  });
+});
+
+app.delete('/api/prepayments/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const prepaymentIndex = prepayments.findIndex(p => p.id === id);
+  
+  if (prepaymentIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '预付款不存在'
+    });
+  }
+  
+  prepayments.splice(prepaymentIndex, 1);
+  
+  res.json({
+    success: true,
+    message: '预付款删除成功'
+  });
+});
+
+// 广告费管理API
+app.get('/api/advertising-fees', (req, res) => {
+  res.json({
+    success: true,
+    data: advertisingFees,
+    total: advertisingFees.length
+  });
+});
+
+app.post('/api/advertising-fees', (req, res) => {
+  const {
+    campaignName, platform, adType, targetAudience, budget, startDate, endDate, project, description
+  } = req.body;
+  
+  if (!campaignName || !platform || !budget) {
+    return res.status(400).json({
+      success: false,
+      message: '缺少必填字段'
+    });
+  }
+  
+  const newAdvertisingFee = {
+    id: advertisingFees.length + 1,
+    campaignName,
+    platform,
+    adType: adType || '',
+    targetAudience: targetAudience || '',
+    budget: parseFloat(budget),
+    spent: 0,
+    remaining: parseFloat(budget),
+    startDate: startDate || new Date().toISOString().split('T')[0],
+    endDate: endDate || '',
+    status: '未开始',
+    project: project || '',
+    impressions: 0,
+    clicks: 0,
+    conversions: 0,
+    ctr: 0,
+    cpc: 0,
+    cpa: 0,
+    description: description || ''
+  };
+  
+  advertisingFees.push(newAdvertisingFee);
+  
+  res.json({
+    success: true,
+    data: newAdvertisingFee,
+    message: '广告活动创建成功'
+  });
+});
+
+app.put('/api/advertising-fees/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const advertisingIndex = advertisingFees.findIndex(a => a.id === id);
+  
+  if (advertisingIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '广告活动不存在'
+    });
+  }
+  
+  const updatedData = {
+    ...advertisingFees[advertisingIndex],
+    ...req.body,
+    budget: parseFloat(req.body.budget) || advertisingFees[advertisingIndex].budget
+  };
+  
+  // 重新计算剩余金额
+  updatedData.remaining = updatedData.budget - updatedData.spent;
+  
+  advertisingFees[advertisingIndex] = updatedData;
+  
+  res.json({
+    success: true,
+    data: advertisingFees[advertisingIndex],
+    message: '广告活动更新成功'
+  });
+});
+
+app.delete('/api/advertising-fees/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const advertisingIndex = advertisingFees.findIndex(a => a.id === id);
+  
+  if (advertisingIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '广告活动不存在'
+    });
+  }
+  
+  advertisingFees.splice(advertisingIndex, 1);
+  
+  res.json({
+    success: true,
+    message: '广告活动删除成功'
+  });
+});
+
 // 获取服务器成本统计
 app.get('/api/server-statistics', (req, res) => {
   const totalServers = servers.length;
@@ -670,6 +979,104 @@ app.get('/api/fund-statistics', (req, res) => {
       totalIncome,
       totalExpense,
       netFlow: totalIncome - totalExpense
+    }
+  });
+});
+
+// 获取预付款统计
+app.get('/api/prepayment-statistics', (req, res) => {
+  const totalPrepayments = prepayments.length;
+  const totalAmount = prepayments.reduce((sum, p) => sum + p.amount, 0);
+  const totalPaid = prepayments.reduce((sum, p) => sum + p.paidAmount, 0);
+  const totalRemaining = prepayments.reduce((sum, p) => sum + p.remainingAmount, 0);
+  
+  // 按供应商统计
+  const vendorStats = {};
+  prepayments.forEach(prepayment => {
+    if (!vendorStats[prepayment.vendor]) {
+      vendorStats[prepayment.vendor] = {
+        count: 0,
+        totalAmount: 0,
+        remainingAmount: 0
+      };
+    }
+    vendorStats[prepayment.vendor].count += 1;
+    vendorStats[prepayment.vendor].totalAmount += prepayment.amount;
+    vendorStats[prepayment.vendor].remainingAmount += prepayment.remainingAmount;
+  });
+  
+  // 按状态统计
+  const statusStats = {
+    '未使用': prepayments.filter(p => p.status === '未使用').length,
+    '使用中': prepayments.filter(p => p.status === '使用中').length,
+    '已用完': prepayments.filter(p => p.status === '已用完').length
+  };
+  
+  res.json({
+    success: true,
+    data: {
+      totalPrepayments,
+      totalAmount,
+      totalPaid,
+      totalRemaining,
+      vendorStats,
+      statusStats
+    }
+  });
+});
+
+// 获取广告费统计
+app.get('/api/advertising-statistics', (req, res) => {
+  const totalCampaigns = advertisingFees.length;
+  const totalBudget = advertisingFees.reduce((sum, a) => sum + a.budget, 0);
+  const totalSpent = advertisingFees.reduce((sum, a) => sum + a.spent, 0);
+  const totalRemaining = advertisingFees.reduce((sum, a) => sum + a.remaining, 0);
+  
+  // 按平台统计
+  const platformStats = {};
+  advertisingFees.forEach(ad => {
+    if (!platformStats[ad.platform]) {
+      platformStats[ad.platform] = {
+        count: 0,
+        budget: 0,
+        spent: 0
+      };
+    }
+    platformStats[ad.platform].count += 1;
+    platformStats[ad.platform].budget += ad.budget;
+    platformStats[ad.platform].spent += ad.spent;
+  });
+  
+  // 按状态统计
+  const statusStats = {
+    '未开始': advertisingFees.filter(a => a.status === '未开始').length,
+    '进行中': advertisingFees.filter(a => a.status === '进行中').length,
+    '已完成': advertisingFees.filter(a => a.status === '已完成').length
+  };
+  
+  // 总体效果统计
+  const totalImpressions = advertisingFees.reduce((sum, a) => sum + a.impressions, 0);
+  const totalClicks = advertisingFees.reduce((sum, a) => sum + a.clicks, 0);
+  const totalConversions = advertisingFees.reduce((sum, a) => sum + a.conversions, 0);
+  const avgCtr = totalImpressions > 0 ? ((totalClicks / totalImpressions) * 100).toFixed(2) : 0;
+  const avgCpc = totalClicks > 0 ? (totalSpent / totalClicks).toFixed(2) : 0;
+  const avgCpa = totalConversions > 0 ? (totalSpent / totalConversions).toFixed(2) : 0;
+  
+  res.json({
+    success: true,
+    data: {
+      totalCampaigns,
+      totalBudget,
+      totalSpent,
+      totalRemaining,
+      platformStats,
+      statusStats,
+      totalImpressions,
+      totalClicks,
+      totalConversions,
+      avgCtr: parseFloat(avgCtr),
+      avgCpc: parseFloat(avgCpc),
+      avgCpa: parseFloat(avgCpa)
     }
   });
 });
