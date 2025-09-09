@@ -66,6 +66,132 @@ let projects = [
   }
 ];
 
+// 模拟数据库 - 服务器数据
+let servers = [
+  {
+    id: 1,
+    serverName: '阿里云ECS-游戏服务器1',
+    instanceId: 'i-bp1234567890abcdef',
+    game: '王者荣耀',
+    region: '华东1（杭州）',
+    instanceType: 'ecs.c6.large',
+    cpu: '2核',
+    memory: '4GB',
+    disk: '40GB SSD',
+    bandwidth: '5Mbps',
+    monthlyCost: 800,
+    status: '运行中',
+    startDate: '2024-01-01',
+    endDate: '2024-12-31',
+    description: '王者荣耀游戏主服务器'
+  },
+  {
+    id: 2,
+    serverName: '腾讯云CVM-数据库服务器',
+    instanceId: 'ins-1234567890abcdef',
+    game: '和平精英',
+    region: '北京',
+    instanceType: 'S5.MEDIUM4',
+    cpu: '2核',
+    memory: '4GB',
+    disk: '50GB SSD',
+    bandwidth: '3Mbps',
+    monthlyCost: 600,
+    status: '运行中',
+    startDate: '2024-02-01',
+    endDate: '2024-12-31',
+    description: '和平精英数据库服务器'
+  },
+  {
+    id: 3,
+    serverName: '华为云ECS-测试服务器',
+    instanceId: 'i-1234567890abcdef',
+    game: '测试环境',
+    region: '华北-北京四',
+    instanceType: 's6.large.2',
+    cpu: '2核',
+    memory: '4GB',
+    disk: '40GB SSD',
+    bandwidth: '2Mbps',
+    monthlyCost: 400,
+    status: '已停止',
+    startDate: '2024-03-01',
+    endDate: '2024-11-30',
+    description: '游戏测试环境服务器'
+  }
+];
+
+// 模拟数据库 - 银行账户数据
+let bankAccounts = [
+  {
+    id: 1,
+    bankName: '中国工商银行',
+    accountName: '公司基本账户',
+    accountNumber: '6222****1234',
+    accountType: '基本账户',
+    balance: 2500000,
+    currency: 'CNY',
+    lastUpdate: '2024-12-09',
+    description: '公司主要经营账户'
+  },
+  {
+    id: 2,
+    bankName: '中国建设银行',
+    accountName: '公司专用账户',
+    accountNumber: '6217****5678',
+    accountType: '专用账户',
+    balance: 800000,
+    currency: 'CNY',
+    lastUpdate: '2024-12-09',
+    description: '游戏充值专用账户'
+  },
+  {
+    id: 3,
+    bankName: '招商银行',
+    accountName: '公司备用金账户',
+    accountNumber: '6225****9012',
+    accountType: '一般账户',
+    balance: 500000,
+    currency: 'CNY',
+    lastUpdate: '2024-12-09',
+    description: '公司备用资金账户'
+  }
+];
+
+// 模拟数据库 - 资金流水数据
+let fundFlows = [
+  {
+    id: 1,
+    accountId: 1,
+    transactionType: '收入',
+    amount: 1000000,
+    description: '王者荣耀充值收入',
+    date: '2024-12-01',
+    balance: 2500000,
+    reference: 'PROJ001'
+  },
+  {
+    id: 2,
+    accountId: 1,
+    transactionType: '支出',
+    amount: 80000,
+    description: '服务器费用',
+    date: '2024-12-02',
+    balance: 2420000,
+    reference: 'SERVER001'
+  },
+  {
+    id: 3,
+    accountId: 2,
+    transactionType: '收入',
+    amount: 800000,
+    description: '和平精英充值收入',
+    date: '2024-12-02',
+    balance: 800000,
+    reference: 'PROJ002'
+  }
+];
+
 // 获取所有项目数据
 app.get('/api/projects', (req, res) => {
   res.json({
@@ -225,6 +351,326 @@ app.delete('/api/projects/:id', (req, res) => {
   res.json({
     success: true,
     message: '项目删除成功'
+  });
+});
+
+// 服务器管理API
+app.get('/api/servers', (req, res) => {
+  res.json({
+    success: true,
+    data: servers,
+    total: servers.length
+  });
+});
+
+app.post('/api/servers', (req, res) => {
+  const {
+    serverName, instanceId, game, region, instanceType, cpu, memory,
+    disk, bandwidth, monthlyCost, status, startDate, endDate, description
+  } = req.body;
+  
+  if (!serverName || !instanceId || !monthlyCost) {
+    return res.status(400).json({
+      success: false,
+      message: '缺少必填字段'
+    });
+  }
+  
+  const newServer = {
+    id: servers.length + 1,
+    serverName,
+    instanceId,
+    game: game || '',
+    region: region || '',
+    instanceType: instanceType || '',
+    cpu: cpu || '',
+    memory: memory || '',
+    disk: disk || '',
+    bandwidth: bandwidth || '',
+    monthlyCost: parseFloat(monthlyCost),
+    status: status || '运行中',
+    startDate: startDate || new Date().toISOString().split('T')[0],
+    endDate: endDate || '',
+    description: description || ''
+  };
+  
+  servers.push(newServer);
+  
+  res.json({
+    success: true,
+    data: newServer,
+    message: '服务器创建成功'
+  });
+});
+
+app.put('/api/servers/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const serverIndex = servers.findIndex(s => s.id === id);
+  
+  if (serverIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '服务器不存在'
+    });
+  }
+  
+  servers[serverIndex] = {
+    ...servers[serverIndex],
+    ...req.body,
+    monthlyCost: parseFloat(req.body.monthlyCost) || servers[serverIndex].monthlyCost
+  };
+  
+  res.json({
+    success: true,
+    data: servers[serverIndex],
+    message: '服务器更新成功'
+  });
+});
+
+app.delete('/api/servers/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const serverIndex = servers.findIndex(s => s.id === id);
+  
+  if (serverIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '服务器不存在'
+    });
+  }
+  
+  servers.splice(serverIndex, 1);
+  
+  res.json({
+    success: true,
+    message: '服务器删除成功'
+  });
+});
+
+// 银行账户管理API
+app.get('/api/bank-accounts', (req, res) => {
+  res.json({
+    success: true,
+    data: bankAccounts,
+    total: bankAccounts.length
+  });
+});
+
+app.post('/api/bank-accounts', (req, res) => {
+  const {
+    bankName, accountName, accountNumber, accountType, balance, currency, description
+  } = req.body;
+  
+  if (!bankName || !accountName || !accountNumber) {
+    return res.status(400).json({
+      success: false,
+      message: '缺少必填字段'
+    });
+  }
+  
+  const newAccount = {
+    id: bankAccounts.length + 1,
+    bankName,
+    accountName,
+    accountNumber,
+    accountType: accountType || '一般账户',
+    balance: parseFloat(balance) || 0,
+    currency: currency || 'CNY',
+    lastUpdate: new Date().toISOString().split('T')[0],
+    description: description || ''
+  };
+  
+  bankAccounts.push(newAccount);
+  
+  res.json({
+    success: true,
+    data: newAccount,
+    message: '银行账户创建成功'
+  });
+});
+
+app.put('/api/bank-accounts/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const accountIndex = bankAccounts.findIndex(a => a.id === id);
+  
+  if (accountIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '银行账户不存在'
+    });
+  }
+  
+  bankAccounts[accountIndex] = {
+    ...bankAccounts[accountIndex],
+    ...req.body,
+    balance: parseFloat(req.body.balance) || bankAccounts[accountIndex].balance,
+    lastUpdate: new Date().toISOString().split('T')[0]
+  };
+  
+  res.json({
+    success: true,
+    data: bankAccounts[accountIndex],
+    message: '银行账户更新成功'
+  });
+});
+
+app.delete('/api/bank-accounts/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const accountIndex = bankAccounts.findIndex(a => a.id === id);
+  
+  if (accountIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '银行账户不存在'
+    });
+  }
+  
+  bankAccounts.splice(accountIndex, 1);
+  
+  res.json({
+    success: true,
+    message: '银行账户删除成功'
+  });
+});
+
+// 资金流水管理API
+app.get('/api/fund-flows', (req, res) => {
+  res.json({
+    success: true,
+    data: fundFlows,
+    total: fundFlows.length
+  });
+});
+
+app.post('/api/fund-flows', (req, res) => {
+  const {
+    accountId, transactionType, amount, description, date, reference
+  } = req.body;
+  
+  if (!accountId || !transactionType || !amount || !description) {
+    return res.status(400).json({
+      success: false,
+      message: '缺少必填字段'
+    });
+  }
+  
+  const account = bankAccounts.find(a => a.id === parseInt(accountId));
+  if (!account) {
+    return res.status(404).json({
+      success: false,
+      message: '银行账户不存在'
+    });
+  }
+  
+  const transactionAmount = parseFloat(amount);
+  const newBalance = transactionType === '收入' 
+    ? account.balance + transactionAmount 
+    : account.balance - transactionAmount;
+  
+  const newFlow = {
+    id: fundFlows.length + 1,
+    accountId: parseInt(accountId),
+    transactionType,
+    amount: transactionAmount,
+    description,
+    date: date || new Date().toISOString().split('T')[0],
+    balance: newBalance,
+    reference: reference || ''
+  };
+  
+  // 更新账户余额
+  account.balance = newBalance;
+  account.lastUpdate = newFlow.date;
+  
+  fundFlows.push(newFlow);
+  
+  res.json({
+    success: true,
+    data: newFlow,
+    message: '资金流水创建成功'
+  });
+});
+
+// 获取服务器成本统计
+app.get('/api/server-statistics', (req, res) => {
+  const totalServers = servers.length;
+  const runningServers = servers.filter(s => s.status === '运行中').length;
+  const totalMonthlyCost = servers.reduce((sum, s) => sum + s.monthlyCost, 0);
+  const totalAnnualCost = totalMonthlyCost * 12;
+  
+  // 按游戏统计
+  const gameStats = {};
+  servers.forEach(server => {
+    if (!gameStats[server.game]) {
+      gameStats[server.game] = {
+        count: 0,
+        monthlyCost: 0,
+        running: 0
+      };
+    }
+    gameStats[server.game].count += 1;
+    gameStats[server.game].monthlyCost += server.monthlyCost;
+    if (server.status === '运行中') {
+      gameStats[server.game].running += 1;
+    }
+  });
+  
+  res.json({
+    success: true,
+    data: {
+      totalServers,
+      runningServers,
+      totalMonthlyCost,
+      totalAnnualCost,
+      gameStats
+    }
+  });
+});
+
+// 获取资金统计
+app.get('/api/fund-statistics', (req, res) => {
+  const totalBalance = bankAccounts.reduce((sum, a) => sum + a.balance, 0);
+  const totalAccounts = bankAccounts.length;
+  
+  // 按银行统计
+  const bankStats = {};
+  bankAccounts.forEach(account => {
+    if (!bankStats[account.bankName]) {
+      bankStats[account.bankName] = {
+        count: 0,
+        balance: 0
+      };
+    }
+    bankStats[account.bankName].count += 1;
+    bankStats[account.bankName].balance += account.balance;
+  });
+  
+  // 最近30天资金流水统计
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  
+  const recentFlows = fundFlows.filter(flow => 
+    new Date(flow.date) >= thirtyDaysAgo
+  );
+  
+  const totalIncome = recentFlows
+    .filter(flow => flow.transactionType === '收入')
+    .reduce((sum, flow) => sum + flow.amount, 0);
+  
+  const totalExpense = recentFlows
+    .filter(flow => flow.transactionType === '支出')
+    .reduce((sum, flow) => sum + flow.amount, 0);
+  
+  res.json({
+    success: true,
+    data: {
+      totalBalance,
+      totalAccounts,
+      bankStats,
+      recentFlows: recentFlows.length,
+      totalIncome,
+      totalExpense,
+      netFlow: totalIncome - totalExpense
+    }
   });
 });
 

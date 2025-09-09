@@ -18,6 +18,16 @@ const Layout = ({ children }) => {
       label: '项目管理',
     },
     {
+      key: '/servers',
+      icon: '🖥️',
+      label: '服务器管理',
+    },
+    {
+      key: '/bank',
+      icon: '🏦',
+      label: '银行资金',
+    },
+    {
       key: '/departments',
       icon: '🏢',
       label: '部门管理',
