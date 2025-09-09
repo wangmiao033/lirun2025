@@ -5,7 +5,7 @@ import { DashboardOutlined, BarChartOutlined, TeamOutlined, UploadOutlined } fro
 const { Header, Content } = Layout;
 const { Title, Paragraph } = Typography;
 
-const App: React.FC = () => {
+const App = () => {
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Header style={{ background: '#fff', padding: '0 24px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>

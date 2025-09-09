@@ -4,11 +4,11 @@ FROM node:18-alpine
 # 设置工作目录
 WORKDIR /app
 
-# 复制package.json和package-lock.json
+# 复制package.json
 COPY package*.json ./
 
 # 安装依赖
-RUN npm install --only=production
+RUN npm install
 
 # 复制源代码
 COPY . .
