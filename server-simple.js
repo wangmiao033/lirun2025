@@ -246,6 +246,70 @@ let prepayments = [
   }
 ];
 
+// 模拟数据库 - 账单数据
+let bills = [
+  {
+    id: 1,
+    billNumber: 'BILL-2024-001',
+    billType: '供应商账单',
+    recipient: '阿里云',
+    recipientType: '供应商',
+    project: '王者荣耀',
+    period: '2024年12月',
+    totalAmount: 50000,
+    status: '待发送',
+    items: [
+      { name: 'ECS服务器费用', amount: 30000, description: '王者荣耀游戏服务器' },
+      { name: 'RDS数据库费用', amount: 15000, description: '数据库服务' },
+      { name: 'CDN加速费用', amount: 5000, description: '内容分发网络' }
+    ],
+    createDate: '2024-12-10',
+    sendDate: '',
+    dueDate: '2024-12-31',
+    description: '12月份服务器相关费用'
+  },
+  {
+    id: 2,
+    billNumber: 'BILL-2024-002',
+    billType: '研发商账单',
+    recipient: '腾讯游戏工作室',
+    recipientType: '研发商',
+    project: '和平精英',
+    period: '2024年12月',
+    totalAmount: 200000,
+    status: '已发送',
+    items: [
+      { name: '游戏分成费用', amount: 150000, description: '游戏收入分成' },
+      { name: '技术支持费用', amount: 30000, description: '技术支持和维护' },
+      { name: '版权使用费用', amount: 20000, description: '游戏版权使用费' }
+    ],
+    createDate: '2024-12-08',
+    sendDate: '2024-12-09',
+    dueDate: '2024-12-25',
+    description: '12月份游戏分成和技术费用'
+  },
+  {
+    id: 3,
+    billNumber: 'BILL-2024-003',
+    billType: '供应商账单',
+    recipient: '华为云',
+    recipientType: '供应商',
+    project: '测试环境',
+    period: '2024年12月',
+    totalAmount: 15000,
+    status: '已确认',
+    items: [
+      { name: '云服务器费用', amount: 10000, description: '测试环境服务器' },
+      { name: '存储费用', amount: 3000, description: '数据存储服务' },
+      { name: '网络费用', amount: 2000, description: '网络带宽费用' }
+    ],
+    createDate: '2024-12-05',
+    sendDate: '2024-12-06',
+    dueDate: '2024-12-20',
+    description: '12月份测试环境费用'
+  }
+];
+
 // 模拟数据库 - 广告费数据
 let advertisingFees = [
   {
@@ -1021,6 +1085,148 @@ app.get('/api/prepayment-statistics', (req, res) => {
       totalRemaining,
       vendorStats,
       statusStats
+    }
+  });
+});
+
+// 账单管理API
+app.get('/api/bills', (req, res) => {
+  res.json({
+    success: true,
+    data: bills,
+    total: bills.length
+  });
+});
+
+app.post('/api/bills', (req, res) => {
+  const {
+    billType, recipient, recipientType, project, period, items, dueDate, description
+  } = req.body;
+  
+  if (!billType || !recipient || !project || !period || !items || !Array.isArray(items)) {
+    return res.status(400).json({
+      success: false,
+      message: '缺少必填字段'
+    });
+  }
+  
+  const totalAmount = items.reduce((sum, item) => sum + (item.amount || 0), 0);
+  const billNumber = `BILL-${new Date().getFullYear()}-${String(bills.length + 1).padStart(3, '0')}`;
+  
+  const newBill = {
+    id: bills.length + 1,
+    billNumber,
+    billType,
+    recipient,
+    recipientType: recipientType || '供应商',
+    project,
+    period,
+    totalAmount,
+    status: '待发送',
+    items: items.map(item => ({
+      name: item.name || '',
+      amount: parseFloat(item.amount) || 0,
+      description: item.description || ''
+    })),
+    createDate: new Date().toISOString().split('T')[0],
+    sendDate: '',
+    dueDate: dueDate || '',
+    description: description || ''
+  };
+  
+  bills.push(newBill);
+  
+  res.json({
+    success: true,
+    data: newBill,
+    message: '账单创建成功'
+  });
+});
+
+app.put('/api/bills/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const billIndex = bills.findIndex(b => b.id === id);
+  
+  if (billIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '账单不存在'
+    });
+  }
+  
+  const { status, sendDate } = req.body;
+  
+  if (status) {
+    bills[billIndex].status = status;
+  }
+  
+  if (sendDate) {
+    bills[billIndex].sendDate = sendDate;
+  }
+  
+  res.json({
+    success: true,
+    data: bills[billIndex],
+    message: '账单更新成功'
+  });
+});
+
+app.delete('/api/bills/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const billIndex = bills.findIndex(b => b.id === id);
+  
+  if (billIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '账单不存在'
+    });
+  }
+  
+  bills.splice(billIndex, 1);
+  
+  res.json({
+    success: true,
+    message: '账单删除成功'
+  });
+});
+
+// 获取账单统计
+app.get('/api/bill-statistics', (req, res) => {
+  const totalBills = bills.length;
+  const totalAmount = bills.reduce((sum, b) => sum + b.totalAmount, 0);
+  
+  const statusStats = {
+    '待发送': bills.filter(b => b.status === '待发送').length,
+    '已发送': bills.filter(b => b.status === '已发送').length,
+    '已确认': bills.filter(b => b.status === '已确认').length,
+    '已付款': bills.filter(b => b.status === '已付款').length
+  };
+  
+  const typeStats = {
+    '供应商账单': bills.filter(b => b.billType === '供应商账单').length,
+    '研发商账单': bills.filter(b => b.billType === '研发商账单').length
+  };
+  
+  const recipientStats = {};
+  bills.forEach(bill => {
+    if (!recipientStats[bill.recipient]) {
+      recipientStats[bill.recipient] = {
+        count: 0,
+        totalAmount: 0
+      };
+    }
+    recipientStats[bill.recipient].count += 1;
+    recipientStats[bill.recipient].totalAmount += bill.totalAmount;
+  });
+  
+  res.json({
+    success: true,
+    data: {
+      totalBills,
+      totalAmount,
+      statusStats,
+      typeStats,
+      recipientStats
     }
   });
 });

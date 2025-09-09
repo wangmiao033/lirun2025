@@ -38,6 +38,11 @@ const Layout = ({ children }) => {
       label: '广告费管理',
     },
     {
+      key: '/billing',
+      icon: '📋',
+      label: '对账管理',
+    },
+    {
       key: '/departments',
       icon: '🏢',
       label: '部门管理',

@@ -7,6 +7,7 @@ import ServerManagement from './pages/ServerManagement';
 import BankManagement from './pages/BankManagement';
 import PrepaymentManagement from './pages/PrepaymentManagement';
 import AdvertisingManagement from './pages/AdvertisingManagement';
+import BillingManagement from './pages/BillingManagement';
 import DepartmentManagement from './pages/DepartmentManagement';
 import DataImport from './pages/DataImport';
 import Reports from './pages/Reports';
@@ -22,6 +23,7 @@ const App = () => {
           <Route path="/bank" element={<BankManagement />} />
           <Route path="/prepayments" element={<PrepaymentManagement />} />
           <Route path="/advertising" element={<AdvertisingManagement />} />
+          <Route path="/billing" element={<BillingManagement />} />
           <Route path="/departments" element={<DepartmentManagement />} />
           <Route path="/import" element={<DataImport />} />
           <Route path="/reports" element={<Reports />} />
