@@ -8,14 +8,14 @@ WORKDIR /app
 COPY package*.json ./
 
 # 安装依赖
-RUN npm install
+RUN npm install --production
 
 # 复制源代码
 COPY . .
 
 # 构建前端
 WORKDIR /app/client
-RUN npm install
+RUN npm install --production
 RUN npm run build
 
 # 回到根目录
