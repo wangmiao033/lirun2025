@@ -1196,38 +1196,54 @@ app.get('/api/statistics', (req, res) => {
 // 导出数据为Excel
 app.get('/api/export', (req, res) => {
   try {
-    const worksheet = xlsx.utils.json_to_sheet(projects.map(p => ({
-      '项目名称': p.projectName,
-      '公司收入': p.companyRevenue,
-      '游戏充值流水': p.gameRechargeFlow,
-      '异常退款': p.abnormalRefund,
-      '测试费': p.testFee,
-      '代金券': p.voucher,
-      '通道': p.channel,
-      '代扣税率': p.withholdingTaxRate,
-      '分成': p.sharing,
-      '分成比例': p.sharingRatio,
-      '产品成本': p.productCost,
-      '预付': p.prepaid,
-      '服务器': p.server,
-      '广告费': p.advertisingFee,
-      '成本合计': p.costTotal,
-      '毛利': p.grossProfit,
-      '毛利率(%)': p.grossProfitRate,
-      '日期': p.date,
-      '描述': p.description
-    })));
+    console.log('开始导出数据，项目数量:', projects.length);
     
+    if (!projects || projects.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: '没有数据可导出'
+      });
+    }
+    
+    const exportData = projects.map(p => ({
+      '项目名称': p.projectName || '',
+      '公司收入': p.companyRevenue || 0,
+      '游戏充值流水': p.gameRechargeFlow || 0,
+      '异常退款': p.abnormalRefund || 0,
+      '测试费': p.testFee || 0,
+      '代金券': p.voucher || 0,
+      '通道': p.channel || 0,
+      '代扣税率': p.withholdingTaxRate || 0,
+      '分成': p.sharing || 0,
+      '分成比例': p.sharingRatio || 0,
+      '产品成本': p.productCost || 0,
+      '预付': p.prepaid || 0,
+      '服务器': p.server || 0,
+      '广告费': p.advertisingFee || 0,
+      '成本合计': p.costTotal || 0,
+      '毛利': p.grossProfit || 0,
+      '毛利率(%)': p.grossProfitRate || 0,
+      '日期': p.date || '',
+      '描述': p.description || ''
+    }));
+    
+    console.log('准备导出数据:', exportData.length, '条记录');
+    
+    const worksheet = xlsx.utils.json_to_sheet(exportData);
     const workbook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(workbook, worksheet, '项目数据');
     
     const buffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
     
+    console.log('Excel文件生成成功，大小:', buffer.length, 'bytes');
+    
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.setHeader('Content-Disposition', 'attachment; filename=项目数据.xlsx');
+    res.setHeader('Content-Length', buffer.length);
     res.send(buffer);
     
   } catch (error) {
+    console.error('导出失败:', error);
     res.status(500).json({
       success: false,
       message: '导出失败: ' + error.message

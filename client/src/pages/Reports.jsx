@@ -33,23 +33,44 @@ const Reports = () => {
   const handleExport = async () => {
     setExporting(true);
     try {
-      const response = await fetch('/api/export');
+      const response = await fetch('/api/export', {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        }
+      });
+      
       if (response.ok) {
         const blob = await response.blob();
+        
+        // 检查blob是否有效
+        if (blob.size === 0) {
+          throw new Error('导出的文件为空');
+        }
+        
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = `项目数据_${new Date().toISOString().split('T')[0]}.xlsx`;
+        a.style.display = 'none';
         document.body.appendChild(a);
         a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        
+        // 清理
+        setTimeout(() => {
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        }, 100);
+        
+        alert('导出成功！');
       } else {
-        alert('导出失败');
+        const errorText = await response.text();
+        console.error('导出失败:', response.status, errorText);
+        alert(`导出失败: ${response.status} ${response.statusText}`);
       }
     } catch (error) {
       console.error('导出失败:', error);
-      alert('导出失败');
+      alert(`导出失败: ${error.message}`);
     } finally {
       setExporting(false);
     }
