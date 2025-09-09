@@ -72,25 +72,48 @@ const DataImport = () => {
     // 创建模板数据
     const templateData = [
       {
-        '部门': '销售部',
-        '项目': '产品A销售',
-        '收入': 500000,
-        '成本': 350000,
+        '项目名称': '王者荣耀充值项目',
+        '公司收入': 1000000,
+        '游戏充值流水': 800000,
+        '异常退款': 50000,
+        '测试费': 10000,
+        '代金券': 20000,
+        '通道': 30000,
+        '代扣税率': 0.06,
+        '分成': 400000,
+        '分成比例': 0.5,
+        '产品成本': 200000,
+        '预付': 50000,
+        '服务器': 80000,
+        '广告费': 100000,
         '日期': '2024-12-01',
-        '描述': 'Q4季度产品A销售业绩'
+        '描述': '王者荣耀游戏充值流水项目'
       },
       {
-        '部门': '技术部',
-        '项目': '软件开发',
-        '收入': 800000,
-        '成本': 600000,
+        '项目名称': '和平精英推广项目',
+        '公司收入': 800000,
+        '游戏充值流水': 600000,
+        '异常退款': 30000,
+        '测试费': 8000,
+        '代金券': 15000,
+        '通道': 25000,
+        '代扣税率': 0.06,
+        '分成': 300000,
+        '分成比例': 0.5,
+        '产品成本': 150000,
+        '预付': 40000,
+        '服务器': 60000,
+        '广告费': 80000,
         '日期': '2024-12-02',
-        '描述': '客户定制软件开发项目'
+        '描述': '和平精英游戏推广和充值项目'
       }
     ];
 
     // 创建CSV内容
-    const headers = ['部门', '项目', '收入', '成本', '日期', '描述'];
+    const headers = [
+      '项目名称', '公司收入', '游戏充值流水', '异常退款', '测试费', '代金券', '通道',
+      '代扣税率', '分成', '分成比例', '产品成本', '预付', '服务器', '广告费', '日期', '描述'
+    ];
     const csvContent = [
       headers.join(','),
       ...templateData.map(row => 
@@ -103,7 +126,7 @@ const DataImport = () => {
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
-    link.setAttribute('download', '利润数据导入模板.csv');
+    link.setAttribute('download', '项目数据导入模板.csv');
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -116,7 +139,7 @@ const DataImport = () => {
       <div style={{ marginBottom: '30px' }}>
         <h1 style={{ margin: 0, color: '#333' }}>数据导入</h1>
         <p style={{ color: '#666', margin: '10px 0 0 0' }}>
-          支持Excel文件批量导入利润数据
+          支持Excel文件批量导入项目数据
         </p>
       </div>
 
@@ -274,7 +297,7 @@ const DataImport = () => {
             {result.success && result.data && (
               <div>
                 <p style={{ margin: '0 0 12px 0', fontWeight: 'bold' }}>
-                  导入的数据预览：
+                  导入的项目数据预览：
                 </p>
                 <div style={{ maxHeight: '200px', overflow: 'auto' }}>
                   <table style={{
@@ -284,21 +307,21 @@ const DataImport = () => {
                   }}>
                     <thead>
                       <tr style={{ backgroundColor: '#f8f9fa' }}>
-                        <th style={{ padding: '8px', border: '1px solid #e9ecef' }}>部门</th>
-                        <th style={{ padding: '8px', border: '1px solid #e9ecef' }}>项目</th>
-                        <th style={{ padding: '8px', border: '1px solid #e9ecef' }}>收入</th>
-                        <th style={{ padding: '8px', border: '1px solid #e9ecef' }}>成本</th>
-                        <th style={{ padding: '8px', border: '1px solid #e9ecef' }}>利润</th>
+                        <th style={{ padding: '8px', border: '1px solid #e9ecef' }}>项目名称</th>
+                        <th style={{ padding: '8px', border: '1px solid #e9ecef' }}>公司收入</th>
+                        <th style={{ padding: '8px', border: '1px solid #e9ecef' }}>成本合计</th>
+                        <th style={{ padding: '8px', border: '1px solid #e9ecef' }}>毛利</th>
+                        <th style={{ padding: '8px', border: '1px solid #e9ecef' }}>毛利率</th>
                       </tr>
                     </thead>
                     <tbody>
                       {result.data.slice(0, 5).map((item, index) => (
                         <tr key={index}>
-                          <td style={{ padding: '8px', border: '1px solid #e9ecef' }}>{item.department}</td>
-                          <td style={{ padding: '8px', border: '1px solid #e9ecef' }}>{item.project}</td>
-                          <td style={{ padding: '8px', border: '1px solid #e9ecef' }}>{item.revenue}</td>
-                          <td style={{ padding: '8px', border: '1px solid #e9ecef' }}>{item.cost}</td>
-                          <td style={{ padding: '8px', border: '1px solid #e9ecef' }}>{item.profit}</td>
+                          <td style={{ padding: '8px', border: '1px solid #e9ecef' }}>{item.projectName}</td>
+                          <td style={{ padding: '8px', border: '1px solid #e9ecef' }}>{item.companyRevenue}</td>
+                          <td style={{ padding: '8px', border: '1px solid #e9ecef' }}>{item.costTotal}</td>
+                          <td style={{ padding: '8px', border: '1px solid #e9ecef' }}>{item.grossProfit}</td>
+                          <td style={{ padding: '8px', border: '1px solid #e9ecef' }}>{item.grossProfitRate}%</td>
                         </tr>
                       ))}
                     </tbody>
@@ -336,20 +359,22 @@ const DataImport = () => {
           <h3 style={{ color: '#333', margin: '0 0 12px 0' }}>Excel文件格式要求</h3>
           <ul style={{ color: '#666', margin: 0, paddingLeft: '20px' }}>
             <li>第一行必须是标题行</li>
-            <li>必须包含以下列：部门、项目、收入、成本、日期</li>
-            <li>可选列：描述</li>
+            <li>必须包含以下列：项目名称、公司收入、日期</li>
+            <li>可选列：游戏充值流水、异常退款、测试费、代金券、通道、代扣税率、分成、分成比例、产品成本、预付、服务器、广告费、描述</li>
             <li>日期格式：YYYY-MM-DD</li>
-            <li>收入和成本必须是数字</li>
+            <li>所有金额字段必须是数字</li>
+            <li>系统会自动计算成本合计、毛利和毛利率</li>
           </ul>
         </div>
         
         <div>
           <h3 style={{ color: '#333', margin: '0 0 12px 0' }}>注意事项</h3>
           <ul style={{ color: '#666', margin: 0, paddingLeft: '20px' }}>
-            <li>系统会自动计算利润和利润率</li>
-            <li>重复的数据会被覆盖</li>
+            <li>系统会自动计算成本合计、毛利和毛利率</li>
+            <li>重复的项目数据会被覆盖</li>
             <li>建议先下载模板文件，按照模板格式填写数据</li>
             <li>导入前请确保数据格式正确</li>
+            <li>项目名称不能为空</li>
           </ul>
         </div>
       </div>

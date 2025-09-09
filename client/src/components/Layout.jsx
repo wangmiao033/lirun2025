@@ -14,8 +14,8 @@ const Layout = ({ children }) => {
     },
     {
       key: '/profits',
-      icon: '💰',
-      label: '利润管理',
+      icon: '🎯',
+      label: '项目管理',
     },
     {
       key: '/departments',

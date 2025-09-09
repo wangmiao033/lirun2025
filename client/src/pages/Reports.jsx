@@ -7,7 +7,7 @@ const Reports = () => {
     totalProfit: 0,
     profitRate: 0,
     totalRecords: 0,
-    departmentStats: {}
+    projectStats: {}
   });
   const [loading, setLoading] = useState(true);
   const [exporting, setExporting] = useState(false);
@@ -39,7 +39,7 @@ const Reports = () => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `利润数据_${new Date().toISOString().split('T')[0]}.xlsx`;
+        a.download = `项目数据_${new Date().toISOString().split('T')[0]}.xlsx`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
@@ -176,7 +176,7 @@ const Reports = () => {
         </div>
       </div>
 
-      {/* 部门业绩分析 */}
+      {/* 项目业绩分析 */}
       <div style={{
         backgroundColor: '#fff',
         padding: '30px',
@@ -184,7 +184,7 @@ const Reports = () => {
         boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
         marginBottom: '30px'
       }}>
-        <h2 style={{ margin: '0 0 30px 0', color: '#333' }}>🏢 部门业绩分析</h2>
+        <h2 style={{ margin: '0 0 30px 0', color: '#333' }}>🎯 项目业绩分析</h2>
         
         <div style={{ overflowX: 'auto' }}>
           <table style={{
@@ -194,18 +194,18 @@ const Reports = () => {
           }}>
             <thead>
               <tr style={{ backgroundColor: '#f8f9fa' }}>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>部门</th>
+                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>项目</th>
                 <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>收入</th>
                 <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>成本</th>
                 <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>利润</th>
                 <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>利润率</th>
-                <th style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>项目数</th>
+                <th style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>记录数</th>
               </tr>
             </thead>
             <tbody>
-              {Object.entries(statistics.departmentStats).map(([dept, stats]) => (
-                <tr key={dept} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                  <td style={{ padding: '16px', fontWeight: 'bold' }}>{dept}</td>
+              {Object.entries(statistics.projectStats).map(([project, stats]) => (
+                <tr key={project} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                  <td style={{ padding: '16px', fontWeight: 'bold' }}>{project}</td>
                   <td style={{ padding: '16px', textAlign: 'right', color: '#52c41a', fontWeight: 'bold' }}>
                     {formatCurrency(stats.revenue)}
                   </td>
@@ -344,8 +344,8 @@ const Reports = () => {
         <div style={{ marginBottom: '20px' }}>
           <h3 style={{ color: '#333', margin: '0 0 12px 0' }}>导出功能</h3>
           <ul style={{ color: '#666', margin: 0, paddingLeft: '20px' }}>
-            <li>支持导出Excel格式的完整利润数据</li>
-            <li>包含所有字段：部门、项目、收入、成本、利润、利润率、日期、描述</li>
+            <li>支持导出Excel格式的完整项目数据</li>
+            <li>包含所有字段：项目名称、公司收入、游戏充值流水、异常退款、测试费、代金券、通道、代扣税率、分成、分成比例、产品成本、预付、服务器、广告费、成本合计、毛利、毛利率、日期、描述</li>
             <li>文件名自动包含导出日期</li>
           </ul>
         </div>
@@ -355,7 +355,7 @@ const Reports = () => {
           <ul style={{ color: '#666', margin: 0, paddingLeft: '20px' }}>
             <li><strong>利润率</strong>：反映盈利能力，建议保持在20%以上</li>
             <li><strong>成本收入比</strong>：反映成本控制能力，建议控制在70%以下</li>
-            <li><strong>部门业绩</strong>：按部门统计收入和利润情况</li>
+            <li><strong>项目业绩</strong>：按项目统计收入和利润情况</li>
           </ul>
         </div>
         
@@ -363,9 +363,10 @@ const Reports = () => {
           <h3 style={{ color: '#333', margin: '0 0 12px 0' }}>建议</h3>
           <ul style={{ color: '#666', margin: 0, paddingLeft: '20px' }}>
             <li>定期导出数据进行备份</li>
-            <li>关注利润率较低的部门，制定改进计划</li>
+            <li>关注利润率较低的项目，制定改进计划</li>
             <li>分析高利润项目的特点，推广成功经验</li>
             <li>建立月度、季度财务分析报告</li>
+            <li>重点关注游戏充值流水和成本控制</li>
           </ul>
         </div>
       </div>

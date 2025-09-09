@@ -1,32 +1,42 @@
 import React, { useState, useEffect } from 'react';
 
 const ProfitManagement = () => {
-  const [profits, setProfits] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [editingProfit, setEditingProfit] = useState(null);
+  const [editingProject, setEditingProject] = useState(null);
   const [formData, setFormData] = useState({
-    department: '',
-    project: '',
-    revenue: '',
-    cost: '',
+    projectName: '',
+    companyRevenue: '',
+    gameRechargeFlow: '',
+    abnormalRefund: '',
+    testFee: '',
+    voucher: '',
+    channel: '',
+    withholdingTaxRate: '',
+    sharing: '',
+    sharingRatio: '',
+    productCost: '',
+    prepaid: '',
+    server: '',
+    advertisingFee: '',
     date: '',
     description: ''
   });
 
   useEffect(() => {
-    fetchProfits();
+    fetchProjects();
   }, []);
 
-  const fetchProfits = async () => {
+  const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/profits');
+      const response = await fetch('/api/projects');
       const result = await response.json();
       if (result.success) {
-        setProfits(result.data);
+        setProjects(result.data);
       }
     } catch (error) {
-      console.error('获取利润数据失败:', error);
+      console.error('获取项目数据失败:', error);
     } finally {
       setLoading(false);
     }
@@ -36,8 +46,8 @@ const ProfitManagement = () => {
     e.preventDefault();
     
     try {
-      const url = editingProfit ? `/api/profits/${editingProfit.id}` : '/api/profits';
-      const method = editingProfit ? 'PUT' : 'POST';
+      const url = editingProject ? `/api/projects/${editingProject.id}` : '/api/projects';
+      const method = editingProject ? 'PUT' : 'POST';
       
       const response = await fetch(url, {
         method,
@@ -49,17 +59,10 @@ const ProfitManagement = () => {
       
       const result = await response.json();
       if (result.success) {
-        fetchProfits();
+        fetchProjects();
         setShowModal(false);
-        setEditingProfit(null);
-        setFormData({
-          department: '',
-          project: '',
-          revenue: '',
-          cost: '',
-          date: '',
-          description: ''
-        });
+        setEditingProject(null);
+        resetForm();
       } else {
         alert(result.message || '操作失败');
       }
@@ -69,30 +72,61 @@ const ProfitManagement = () => {
     }
   };
 
-  const handleEdit = (profit) => {
-    setEditingProfit(profit);
+  const resetForm = () => {
     setFormData({
-      department: profit.department,
-      project: profit.project,
-      revenue: profit.revenue.toString(),
-      cost: profit.cost.toString(),
-      date: profit.date,
-      description: profit.description
+      projectName: '',
+      companyRevenue: '',
+      gameRechargeFlow: '',
+      abnormalRefund: '',
+      testFee: '',
+      voucher: '',
+      channel: '',
+      withholdingTaxRate: '',
+      sharing: '',
+      sharingRatio: '',
+      productCost: '',
+      prepaid: '',
+      server: '',
+      advertisingFee: '',
+      date: '',
+      description: ''
+    });
+  };
+
+  const handleEdit = (project) => {
+    setEditingProject(project);
+    setFormData({
+      projectName: project.projectName,
+      companyRevenue: project.companyRevenue.toString(),
+      gameRechargeFlow: project.gameRechargeFlow.toString(),
+      abnormalRefund: project.abnormalRefund.toString(),
+      testFee: project.testFee.toString(),
+      voucher: project.voucher.toString(),
+      channel: project.channel.toString(),
+      withholdingTaxRate: project.withholdingTaxRate.toString(),
+      sharing: project.sharing.toString(),
+      sharingRatio: project.sharingRatio.toString(),
+      productCost: project.productCost.toString(),
+      prepaid: project.prepaid.toString(),
+      server: project.server.toString(),
+      advertisingFee: project.advertisingFee.toString(),
+      date: project.date,
+      description: project.description
     });
     setShowModal(true);
   };
 
   const handleDelete = async (id) => {
-    if (!confirm('确定要删除这条记录吗？')) return;
+    if (!confirm('确定要删除这个项目吗？')) return;
     
     try {
-      const response = await fetch(`/api/profits/${id}`, {
+      const response = await fetch(`/api/projects/${id}`, {
         method: 'DELETE',
       });
       
       const result = await response.json();
       if (result.success) {
-        fetchProfits();
+        fetchProjects();
       } else {
         alert(result.message || '删除失败');
       }
@@ -127,7 +161,7 @@ const ProfitManagement = () => {
         alignItems: 'center',
         marginBottom: '30px'
       }}>
-        <h1 style={{ margin: 0, color: '#333' }}>利润数据管理</h1>
+        <h1 style={{ margin: 0, color: '#333' }}>项目管理</h1>
         <button
           onClick={() => setShowModal(true)}
           style={{
@@ -141,89 +175,113 @@ const ProfitManagement = () => {
             fontWeight: 'bold'
           }}
         >
-          ➕ 新增利润记录
+          ➕ 新增项目
         </button>
       </div>
 
-      {/* 数据表格 */}
+      {/* 项目卡片列表 */}
       <div style={{
-        backgroundColor: '#fff',
-        borderRadius: '12px',
-        boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+        gap: '24px',
+        marginBottom: '30px'
       }}>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            minWidth: '800px'
+        {projects.map((project) => (
+          <div key={project.id} style={{
+            backgroundColor: '#fff',
+            padding: '24px',
+            borderRadius: '12px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+            border: '1px solid #f0f0f0'
           }}>
-            <thead>
-              <tr style={{ backgroundColor: '#f8f9fa' }}>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>部门</th>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>项目</th>
-                <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>收入</th>
-                <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>成本</th>
-                <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>利润</th>
-                <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>利润率</th>
-                <th style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>日期</th>
-                <th style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              {profits.map((profit) => (
-                <tr key={profit.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                  <td style={{ padding: '16px' }}>{profit.department}</td>
-                  <td style={{ padding: '16px' }}>{profit.project}</td>
-                  <td style={{ padding: '16px', textAlign: 'right', color: '#52c41a', fontWeight: 'bold' }}>
-                    {formatCurrency(profit.revenue)}
-                  </td>
-                  <td style={{ padding: '16px', textAlign: 'right', color: '#fa8c16', fontWeight: 'bold' }}>
-                    {formatCurrency(profit.cost)}
-                  </td>
-                  <td style={{ padding: '16px', textAlign: 'right', color: '#1890ff', fontWeight: 'bold' }}>
-                    {formatCurrency(profit.profit)}
-                  </td>
-                  <td style={{ padding: '16px', textAlign: 'right', color: '#faad14', fontWeight: 'bold' }}>
-                    {profit.profitRate}%
-                  </td>
-                  <td style={{ padding: '16px', textAlign: 'center' }}>{profit.date}</td>
-                  <td style={{ padding: '16px', textAlign: 'center' }}>
-                    <button
-                      onClick={() => handleEdit(profit)}
-                      style={{
-                        backgroundColor: '#1890ff',
-                        color: 'white',
-                        border: 'none',
-                        padding: '6px 12px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px',
-                        marginRight: '8px'
-                      }}
-                    >
-                      编辑
-                    </button>
-                    <button
-                      onClick={() => handleDelete(profit.id)}
-                      style={{
-                        backgroundColor: '#ff4d4f',
-                        color: 'white',
-                        border: 'none',
-                        padding: '6px 12px',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontSize: '12px'
-                      }}
-                    >
-                      删除
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'flex-start',
+              marginBottom: '16px'
+            }}>
+              <h3 style={{ margin: 0, color: '#333', fontSize: '18px' }}>
+                🎯 {project.projectName}
+              </h3>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={() => handleEdit(project)}
+                  style={{
+                    backgroundColor: '#1890ff',
+                    color: 'white',
+                    border: 'none',
+                    padding: '6px 12px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  编辑
+                </button>
+                <button
+                  onClick={() => handleDelete(project.id)}
+                  style={{
+                    backgroundColor: '#ff4d4f',
+                    color: 'white',
+                    border: 'none',
+                    padding: '6px 12px',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '12px'
+                  }}
+                >
+                  删除
+                </button>
+              </div>
+            </div>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: '12px',
+              marginBottom: '16px'
+            }}>
+              <div>
+                <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>公司收入</div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#52c41a' }}>
+                  {formatCurrency(project.companyRevenue)}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>成本合计</div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#fa8c16' }}>
+                  {formatCurrency(project.costTotal)}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>毛利</div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#1890ff' }}>
+                  {formatCurrency(project.grossProfit)}
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>毛利率</div>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#faad14' }}>
+                  {project.grossProfitRate}%
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ marginBottom: '12px' }}>
+              <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>日期</div>
+              <div style={{ fontSize: '14px', color: '#333' }}>{project.date}</div>
+            </div>
+            
+            {project.description && (
+              <div>
+                <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>描述</div>
+                <div style={{ fontSize: '14px', color: '#333', lineHeight: '1.5' }}>
+                  {project.description}
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
       {/* 新增/编辑模态框 */}
@@ -244,63 +302,25 @@ const ProfitManagement = () => {
             backgroundColor: 'white',
             padding: '30px',
             borderRadius: '12px',
-            width: '500px',
+            width: '800px',
             maxWidth: '90vw',
             maxHeight: '90vh',
             overflow: 'auto'
           }}>
             <h2 style={{ margin: '0 0 20px 0', color: '#333' }}>
-              {editingProfit ? '编辑利润记录' : '新增利润记录'}
+              {editingProject ? '编辑项目' : '新增项目'}
             </h2>
             
             <form onSubmit={handleSubmit}>
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                  部门 *
-                </label>
-                <input
-                  type="text"
-                  value={formData.department}
-                  onChange={(e) => setFormData({...formData, department: e.target.value})}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d9d9d9',
-                    borderRadius: '6px',
-                    fontSize: '14px'
-                  }}
-                />
-              </div>
-              
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                  项目 *
-                </label>
-                <input
-                  type="text"
-                  value={formData.project}
-                  onChange={(e) => setFormData({...formData, project: e.target.value})}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d9d9d9',
-                    borderRadius: '6px',
-                    fontSize: '14px'
-                  }}
-                />
-              </div>
-              
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    收入 *
+                    项目名称 *
                   </label>
                   <input
-                    type="number"
-                    value={formData.revenue}
-                    onChange={(e) => setFormData({...formData, revenue: e.target.value})}
+                    type="text"
+                    value={formData.projectName}
+                    onChange={(e) => setFormData({...formData, projectName: e.target.value})}
                     required
                     style={{
                       width: '100%',
@@ -314,12 +334,12 @@ const ProfitManagement = () => {
                 
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    成本 *
+                    日期 *
                   </label>
                   <input
-                    type="number"
-                    value={formData.cost}
-                    onChange={(e) => setFormData({...formData, cost: e.target.value})}
+                    type="date"
+                    value={formData.date}
+                    onChange={(e) => setFormData({...formData, date: e.target.value})}
                     required
                     style={{
                       width: '100%',
@@ -331,24 +351,260 @@ const ProfitManagement = () => {
                   />
                 </div>
               </div>
+
+              <h3 style={{ color: '#333', margin: '0 0 16px 0', borderBottom: '1px solid #f0f0f0', paddingBottom: '8px' }}>
+                收入信息
+              </h3>
               
-              <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                  日期 *
-                </label>
-                <input
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => setFormData({...formData, date: e.target.value})}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d9d9d9',
-                    borderRadius: '6px',
-                    fontSize: '14px'
-                  }}
-                />
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    公司收入 *
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.companyRevenue}
+                    onChange={(e) => setFormData({...formData, companyRevenue: e.target.value})}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    游戏充值流水
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.gameRechargeFlow}
+                    onChange={(e) => setFormData({...formData, gameRechargeFlow: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    异常退款
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.abnormalRefund}
+                    onChange={(e) => setFormData({...formData, abnormalRefund: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    测试费
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.testFee}
+                    onChange={(e) => setFormData({...formData, testFee: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    代金券
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.voucher}
+                    onChange={(e) => setFormData({...formData, voucher: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    通道
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.channel}
+                    onChange={(e) => setFormData({...formData, channel: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <h3 style={{ color: '#333', margin: '0 0 16px 0', borderBottom: '1px solid #f0f0f0', paddingBottom: '8px' }}>
+                分成信息
+              </h3>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    代扣税率
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.withholdingTaxRate}
+                    onChange={(e) => setFormData({...formData, withholdingTaxRate: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    分成
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.sharing}
+                    onChange={(e) => setFormData({...formData, sharing: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    分成比例
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.sharingRatio}
+                    onChange={(e) => setFormData({...formData, sharingRatio: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+              </div>
+
+              <h3 style={{ color: '#333', margin: '0 0 16px 0', borderBottom: '1px solid #f0f0f0', paddingBottom: '8px' }}>
+                成本信息
+              </h3>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    产品成本
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.productCost}
+                    onChange={(e) => setFormData({...formData, productCost: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    预付
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.prepaid}
+                    onChange={(e) => setFormData({...formData, prepaid: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    服务器
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.server}
+                    onChange={(e) => setFormData({...formData, server: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                    广告费
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.advertisingFee}
+                    onChange={(e) => setFormData({...formData, advertisingFee: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      border: '1px solid #d9d9d9',
+                      borderRadius: '6px',
+                      fontSize: '14px'
+                    }}
+                  />
+                </div>
               </div>
               
               <div style={{ marginBottom: '30px' }}>
@@ -375,15 +631,8 @@ const ProfitManagement = () => {
                   type="button"
                   onClick={() => {
                     setShowModal(false);
-                    setEditingProfit(null);
-                    setFormData({
-                      department: '',
-                      project: '',
-                      revenue: '',
-                      cost: '',
-                      date: '',
-                      description: ''
-                    });
+                    setEditingProject(null);
+                    resetForm();
                   }}
                   style={{
                     backgroundColor: '#f5f5f5',
@@ -410,7 +659,7 @@ const ProfitManagement = () => {
                     fontWeight: 'bold'
                   }}
                 >
-                  {editingProfit ? '更新' : '创建'}
+                  {editingProject ? '更新' : '创建'}
                 </button>
               </div>
             </form>

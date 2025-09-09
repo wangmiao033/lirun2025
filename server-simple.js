@@ -16,252 +16,215 @@ app.use(express.urlencoded({ extended: true }));
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// 模拟数据库 - 利润数据
-let profits = [
+// 模拟数据库 - 项目数据
+let projects = [
   {
     id: 1,
-    department: '销售部',
-    project: '产品A销售',
-    revenue: 500000,
-    cost: 350000,
-    profit: 150000,
-    profitRate: 30.0,
+    projectName: '王者荣耀充值项目',
+    companyRevenue: 1000000,
+    gameRechargeFlow: 800000,
+    abnormalRefund: 50000,
+    testFee: 10000,
+    voucher: 20000,
+    channel: 30000,
+    withholdingTaxRate: 0.06,
+    sharing: 400000,
+    sharingRatio: 0.5,
+    productCost: 200000,
+    prepaid: 50000,
+    server: 80000,
+    advertisingFee: 100000,
+    costTotal: 430000,
+    grossProfit: 570000,
+    grossProfitRate: 57.0,
+    revenue: 1000000,
     date: '2024-12-01',
-    description: 'Q4季度产品A销售业绩'
+    description: '王者荣耀游戏充值流水项目'
   },
   {
     id: 2,
-    department: '技术部',
-    project: '软件开发',
+    projectName: '和平精英推广项目',
+    companyRevenue: 800000,
+    gameRechargeFlow: 600000,
+    abnormalRefund: 30000,
+    testFee: 8000,
+    voucher: 15000,
+    channel: 25000,
+    withholdingTaxRate: 0.06,
+    sharing: 300000,
+    sharingRatio: 0.5,
+    productCost: 150000,
+    prepaid: 40000,
+    server: 60000,
+    advertisingFee: 80000,
+    costTotal: 330000,
+    grossProfit: 470000,
+    grossProfitRate: 58.8,
     revenue: 800000,
-    cost: 600000,
-    profit: 200000,
-    profitRate: 25.0,
     date: '2024-12-02',
-    description: '客户定制软件开发项目'
-  },
-  {
-    id: 3,
-    department: '市场部',
-    project: '品牌推广',
-    revenue: 300000,
-    cost: 250000,
-    profit: 50000,
-    profitRate: 16.7,
-    date: '2024-12-03',
-    description: '年度品牌推广活动'
+    description: '和平精英游戏推广和充值项目'
   }
 ];
 
-// 模拟数据库 - 部门数据
-let departments = [
-  { id: 1, name: '销售部', manager: '张三', budget: 1000000, description: '负责产品销售和客户维护' },
-  { id: 2, name: '技术部', manager: '李四', budget: 1500000, description: '负责产品研发和技术支持' },
-  { id: 3, name: '市场部', manager: '王五', budget: 800000, description: '负责市场推广和品牌建设' },
-  { id: 4, name: '财务部', manager: '赵六', budget: 500000, description: '负责财务管理和成本控制' }
-];
-
-// 获取所有利润数据
-app.get('/api/profits', (req, res) => {
+// 获取所有项目数据
+app.get('/api/projects', (req, res) => {
   res.json({
     success: true,
-    data: profits,
-    total: profits.length
+    data: projects,
+    total: projects.length
   });
 });
 
-// 获取单个利润数据
-app.get('/api/profits/:id', (req, res) => {
+// 获取单个项目数据
+app.get('/api/projects/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  const profit = profits.find(p => p.id === id);
+  const project = projects.find(p => p.id === id);
   
-  if (profit) {
+  if (project) {
     res.json({
       success: true,
-      data: profit
+      data: project
     });
   } else {
     res.status(404).json({
       success: false,
-      message: '利润数据不存在'
+      message: '项目不存在'
     });
   }
 });
 
-// 创建新的利润数据
-app.post('/api/profits', (req, res) => {
-  const { department, project, revenue, cost, date, description } = req.body;
+// 创建新的项目数据
+app.post('/api/projects', (req, res) => {
+  const {
+    projectName, companyRevenue, gameRechargeFlow, abnormalRefund, testFee,
+    voucher, channel, withholdingTaxRate, sharing, sharingRatio,
+    productCost, prepaid, server, advertisingFee, date, description
+  } = req.body;
   
-  if (!department || !project || !revenue || !cost || !date) {
+  if (!projectName || !companyRevenue || !date) {
     return res.status(400).json({
       success: false,
       message: '缺少必填字段'
     });
   }
   
-  const profit = revenue - cost;
-  const profitRate = ((profit / revenue) * 100).toFixed(1);
+  // 计算成本合计
+  const costTotal = (productCost || 0) + (prepaid || 0) + (server || 0) + (advertisingFee || 0);
   
-  const newProfit = {
-    id: profits.length + 1,
-    department,
-    project,
-    revenue: parseFloat(revenue),
-    cost: parseFloat(cost),
-    profit: parseFloat(profit),
-    profitRate: parseFloat(profitRate),
+  // 计算毛利
+  const grossProfit = companyRevenue - costTotal;
+  
+  // 计算毛利率
+  const grossProfitRate = companyRevenue > 0 ? ((grossProfit / companyRevenue) * 100).toFixed(1) : 0;
+  
+  const newProject = {
+    id: projects.length + 1,
+    projectName,
+    companyRevenue: parseFloat(companyRevenue),
+    gameRechargeFlow: parseFloat(gameRechargeFlow) || 0,
+    abnormalRefund: parseFloat(abnormalRefund) || 0,
+    testFee: parseFloat(testFee) || 0,
+    voucher: parseFloat(voucher) || 0,
+    channel: parseFloat(channel) || 0,
+    withholdingTaxRate: parseFloat(withholdingTaxRate) || 0,
+    sharing: parseFloat(sharing) || 0,
+    sharingRatio: parseFloat(sharingRatio) || 0,
+    productCost: parseFloat(productCost) || 0,
+    prepaid: parseFloat(prepaid) || 0,
+    server: parseFloat(server) || 0,
+    advertisingFee: parseFloat(advertisingFee) || 0,
+    costTotal: parseFloat(costTotal),
+    grossProfit: parseFloat(grossProfit),
+    grossProfitRate: parseFloat(grossProfitRate),
+    revenue: parseFloat(companyRevenue),
     date,
     description: description || ''
   };
   
-  profits.push(newProfit);
+  projects.push(newProject);
   
   res.json({
     success: true,
-    data: newProfit,
-    message: '利润数据创建成功'
+    data: newProject,
+    message: '项目创建成功'
   });
 });
 
-// 更新利润数据
-app.put('/api/profits/:id', (req, res) => {
+// 更新项目数据
+app.put('/api/projects/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  const { department, project, revenue, cost, date, description } = req.body;
+  const {
+    projectName, companyRevenue, gameRechargeFlow, abnormalRefund, testFee,
+    voucher, channel, withholdingTaxRate, sharing, sharingRatio,
+    productCost, prepaid, server, advertisingFee, date, description
+  } = req.body;
   
-  const profitIndex = profits.findIndex(p => p.id === id);
+  const projectIndex = projects.findIndex(p => p.id === id);
   
-  if (profitIndex === -1) {
+  if (projectIndex === -1) {
     return res.status(404).json({
       success: false,
-      message: '利润数据不存在'
+      message: '项目不存在'
     });
   }
   
-  const profit = revenue - cost;
-  const profitRate = ((profit / revenue) * 100).toFixed(1);
+  // 计算成本合计
+  const costTotal = (productCost || 0) + (prepaid || 0) + (server || 0) + (advertisingFee || 0);
   
-  profits[profitIndex] = {
-    ...profits[profitIndex],
-    department,
-    project,
-    revenue: parseFloat(revenue),
-    cost: parseFloat(cost),
-    profit: parseFloat(profit),
-    profitRate: parseFloat(profitRate),
+  // 计算毛利
+  const grossProfit = companyRevenue - costTotal;
+  
+  // 计算毛利率
+  const grossProfitRate = companyRevenue > 0 ? ((grossProfit / companyRevenue) * 100).toFixed(1) : 0;
+  
+  projects[projectIndex] = {
+    ...projects[projectIndex],
+    projectName,
+    companyRevenue: parseFloat(companyRevenue),
+    gameRechargeFlow: parseFloat(gameRechargeFlow) || 0,
+    abnormalRefund: parseFloat(abnormalRefund) || 0,
+    testFee: parseFloat(testFee) || 0,
+    voucher: parseFloat(voucher) || 0,
+    channel: parseFloat(channel) || 0,
+    withholdingTaxRate: parseFloat(withholdingTaxRate) || 0,
+    sharing: parseFloat(sharing) || 0,
+    sharingRatio: parseFloat(sharingRatio) || 0,
+    productCost: parseFloat(productCost) || 0,
+    prepaid: parseFloat(prepaid) || 0,
+    server: parseFloat(server) || 0,
+    advertisingFee: parseFloat(advertisingFee) || 0,
+    costTotal: parseFloat(costTotal),
+    grossProfit: parseFloat(grossProfit),
+    grossProfitRate: parseFloat(grossProfitRate),
+    revenue: parseFloat(companyRevenue),
     date,
     description: description || ''
   };
   
   res.json({
     success: true,
-    data: profits[profitIndex],
-    message: '利润数据更新成功'
+    data: projects[projectIndex],
+    message: '项目更新成功'
   });
 });
 
-// 删除利润数据
-app.delete('/api/profits/:id', (req, res) => {
+// 删除项目数据
+app.delete('/api/projects/:id', (req, res) => {
   const id = parseInt(req.params.id);
-  const profitIndex = profits.findIndex(p => p.id === id);
+  const projectIndex = projects.findIndex(p => p.id === id);
   
-  if (profitIndex === -1) {
+  if (projectIndex === -1) {
     return res.status(404).json({
       success: false,
-      message: '利润数据不存在'
+      message: '项目不存在'
     });
   }
   
-  profits.splice(profitIndex, 1);
+  projects.splice(projectIndex, 1);
   
   res.json({
     success: true,
-    message: '利润数据删除成功'
-  });
-});
-
-// 获取所有部门
-app.get('/api/departments', (req, res) => {
-  res.json({
-    success: true,
-    data: departments,
-    total: departments.length
-  });
-});
-
-// 创建新部门
-app.post('/api/departments', (req, res) => {
-  const { name, manager, budget, description } = req.body;
-  
-  if (!name || !manager) {
-    return res.status(400).json({
-      success: false,
-      message: '缺少必填字段'
-    });
-  }
-  
-  const newDepartment = {
-    id: departments.length + 1,
-    name,
-    manager,
-    budget: parseFloat(budget) || 0,
-    description: description || ''
-  };
-  
-  departments.push(newDepartment);
-  
-  res.json({
-    success: true,
-    data: newDepartment,
-    message: '部门创建成功'
-  });
-});
-
-// 更新部门
-app.put('/api/departments/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const { name, manager, budget, description } = req.body;
-  
-  const departmentIndex = departments.findIndex(d => d.id === id);
-  
-  if (departmentIndex === -1) {
-    return res.status(404).json({
-      success: false,
-      message: '部门不存在'
-    });
-  }
-  
-  departments[departmentIndex] = {
-    ...departments[departmentIndex],
-    name,
-    manager,
-    budget: parseFloat(budget) || 0,
-    description: description || ''
-  };
-  
-  res.json({
-    success: true,
-    data: departments[departmentIndex],
-    message: '部门更新成功'
-  });
-});
-
-// 删除部门
-app.delete('/api/departments/:id', (req, res) => {
-  const id = parseInt(req.params.id);
-  const departmentIndex = departments.findIndex(d => d.id === id);
-  
-  if (departmentIndex === -1) {
-    return res.status(404).json({
-      success: false,
-      message: '部门不存在'
-    });
-  }
-  
-  departments.splice(departmentIndex, 1);
-  
-  res.json({
-    success: true,
-    message: '部门删除成功'
+    message: '项目删除成功'
   });
 });
 
@@ -281,32 +244,49 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     const data = xlsx.utils.sheet_to_json(worksheet);
     
     // 处理导入的数据
-    const importedProfits = data.map((row, index) => {
-      const revenue = parseFloat(row['收入'] || row['revenue'] || 0);
-      const cost = parseFloat(row['成本'] || row['cost'] || 0);
-      const profit = revenue - cost;
-      const profitRate = revenue > 0 ? ((profit / revenue) * 100).toFixed(1) : 0;
+    const importedProjects = data.map((row, index) => {
+      const companyRevenue = parseFloat(row['公司收入'] || row['companyRevenue'] || 0);
+      const productCost = parseFloat(row['产品成本'] || row['productCost'] || 0);
+      const prepaid = parseFloat(row['预付'] || row['prepaid'] || 0);
+      const server = parseFloat(row['服务器'] || row['server'] || 0);
+      const advertisingFee = parseFloat(row['广告费'] || row['advertisingFee'] || 0);
+      
+      const costTotal = productCost + prepaid + server + advertisingFee;
+      const grossProfit = companyRevenue - costTotal;
+      const grossProfitRate = companyRevenue > 0 ? ((grossProfit / companyRevenue) * 100).toFixed(1) : 0;
       
       return {
-        id: profits.length + index + 1,
-        department: row['部门'] || row['department'] || '未知部门',
-        project: row['项目'] || row['project'] || '未知项目',
-        revenue,
-        cost,
-        profit: parseFloat(profit),
-        profitRate: parseFloat(profitRate),
+        id: projects.length + index + 1,
+        projectName: row['项目名称'] || row['projectName'] || '未知项目',
+        companyRevenue,
+        gameRechargeFlow: parseFloat(row['游戏充值流水'] || row['gameRechargeFlow'] || 0),
+        abnormalRefund: parseFloat(row['异常退款'] || row['abnormalRefund'] || 0),
+        testFee: parseFloat(row['测试费'] || row['testFee'] || 0),
+        voucher: parseFloat(row['代金券'] || row['voucher'] || 0),
+        channel: parseFloat(row['通道'] || row['channel'] || 0),
+        withholdingTaxRate: parseFloat(row['代扣税率'] || row['withholdingTaxRate'] || 0),
+        sharing: parseFloat(row['分成'] || row['sharing'] || 0),
+        sharingRatio: parseFloat(row['分成比例'] || row['sharingRatio'] || 0),
+        productCost,
+        prepaid,
+        server,
+        advertisingFee,
+        costTotal: parseFloat(costTotal),
+        grossProfit: parseFloat(grossProfit),
+        grossProfitRate: parseFloat(grossProfitRate),
+        revenue: companyRevenue,
         date: row['日期'] || row['date'] || new Date().toISOString().split('T')[0],
         description: row['描述'] || row['description'] || ''
       };
     });
     
     // 添加到现有数据
-    profits.push(...importedProfits);
+    projects.push(...importedProjects);
     
     res.json({
       success: true,
-      data: importedProfits,
-      message: `成功导入 ${importedProfits.length} 条利润数据`
+      data: importedProjects,
+      message: `成功导入 ${importedProjects.length} 个项目数据`
     });
     
   } catch (error) {
@@ -319,31 +299,31 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 
 // 获取统计数据
 app.get('/api/statistics', (req, res) => {
-  const totalRevenue = profits.reduce((sum, p) => sum + p.revenue, 0);
-  const totalCost = profits.reduce((sum, p) => sum + p.cost, 0);
+  const totalRevenue = projects.reduce((sum, p) => sum + p.companyRevenue, 0);
+  const totalCost = projects.reduce((sum, p) => sum + p.costTotal, 0);
   const totalProfit = totalRevenue - totalCost;
   const profitRate = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : 0;
   
-  // 按部门统计
-  const departmentStats = {};
-  profits.forEach(profit => {
-    if (!departmentStats[profit.department]) {
-      departmentStats[profit.department] = {
+  // 按项目统计
+  const projectStats = {};
+  projects.forEach(project => {
+    if (!projectStats[project.projectName]) {
+      projectStats[project.projectName] = {
         revenue: 0,
         cost: 0,
         profit: 0,
         count: 0
       };
     }
-    departmentStats[profit.department].revenue += profit.revenue;
-    departmentStats[profit.department].cost += profit.cost;
-    departmentStats[profit.department].profit += profit.profit;
-    departmentStats[profit.department].count += 1;
+    projectStats[project.projectName].revenue += project.companyRevenue;
+    projectStats[project.projectName].cost += project.costTotal;
+    projectStats[project.projectName].profit += project.grossProfit;
+    projectStats[project.projectName].count += 1;
   });
   
-  // 计算部门利润率
-  Object.keys(departmentStats).forEach(dept => {
-    const stats = departmentStats[dept];
+  // 计算项目利润率
+  Object.keys(projectStats).forEach(project => {
+    const stats = projectStats[project];
     stats.profitRate = stats.revenue > 0 ? ((stats.profit / stats.revenue) * 100).toFixed(1) : 0;
   });
   
@@ -354,8 +334,8 @@ app.get('/api/statistics', (req, res) => {
       totalCost,
       totalProfit,
       profitRate: parseFloat(profitRate),
-      departmentStats,
-      totalRecords: profits.length
+      projectStats,
+      totalRecords: projects.length
     }
   });
 });
@@ -363,24 +343,35 @@ app.get('/api/statistics', (req, res) => {
 // 导出数据为Excel
 app.get('/api/export', (req, res) => {
   try {
-    const worksheet = xlsx.utils.json_to_sheet(profits.map(p => ({
-      '部门': p.department,
-      '项目': p.project,
-      '收入': p.revenue,
-      '成本': p.cost,
-      '利润': p.profit,
-      '利润率(%)': p.profitRate,
+    const worksheet = xlsx.utils.json_to_sheet(projects.map(p => ({
+      '项目名称': p.projectName,
+      '公司收入': p.companyRevenue,
+      '游戏充值流水': p.gameRechargeFlow,
+      '异常退款': p.abnormalRefund,
+      '测试费': p.testFee,
+      '代金券': p.voucher,
+      '通道': p.channel,
+      '代扣税率': p.withholdingTaxRate,
+      '分成': p.sharing,
+      '分成比例': p.sharingRatio,
+      '产品成本': p.productCost,
+      '预付': p.prepaid,
+      '服务器': p.server,
+      '广告费': p.advertisingFee,
+      '成本合计': p.costTotal,
+      '毛利': p.grossProfit,
+      '毛利率(%)': p.grossProfitRate,
       '日期': p.date,
       '描述': p.description
     })));
     
     const workbook = xlsx.utils.book_new();
-    xlsx.utils.book_append_sheet(workbook, worksheet, '利润数据');
+    xlsx.utils.book_append_sheet(workbook, worksheet, '项目数据');
     
     const buffer = xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
     
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    res.setHeader('Content-Disposition', 'attachment; filename=利润数据.xlsx');
+    res.setHeader('Content-Disposition', 'attachment; filename=项目数据.xlsx');
     res.send(buffer);
     
   } catch (error) {

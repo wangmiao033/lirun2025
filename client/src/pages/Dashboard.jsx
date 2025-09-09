@@ -7,7 +7,7 @@ const Dashboard = () => {
     totalProfit: 0,
     profitRate: 0,
     totalRecords: 0,
-    departmentStats: {}
+    projectStats: {}
   });
   const [loading, setLoading] = useState(true);
 
@@ -119,7 +119,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* 部门统计 */}
+      {/* 项目统计 */}
       <div style={{
         backgroundColor: '#fff',
         padding: '30px',
@@ -127,8 +127,8 @@ const Dashboard = () => {
         boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
         marginBottom: '30px'
       }}>
-        <h2 style={{ color: '#333', marginBottom: '30px', fontSize: '1.8rem' }}>
-          🏢 部门业绩统计
+        <h2 style={{ margin: '0 0 30px 0', color: '#333', fontSize: '1.8rem' }}>
+          🎯 项目业绩统计
         </h2>
         
         <div style={{
@@ -136,14 +136,14 @@ const Dashboard = () => {
           gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
           gap: '20px'
         }}>
-          {Object.entries(statistics.departmentStats).map(([dept, stats]) => (
-            <div key={dept} style={{
+          {Object.entries(statistics.projectStats).map(([project, stats]) => (
+            <div key={project} style={{
               padding: '20px',
               backgroundColor: '#f8f9fa',
               borderRadius: '8px',
               border: '1px solid #e9ecef'
             }}>
-              <h3 style={{ margin: '0 0 15px 0', color: '#333' }}>{dept}</h3>
+              <h3 style={{ margin: '0 0 15px 0', color: '#333' }}>{project}</h3>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <div>
                   <div style={{ fontSize: '12px', color: '#666' }}>收入</div>
@@ -182,7 +182,7 @@ const Dashboard = () => {
         borderRadius: '12px',
         boxShadow: '0 4px 16px rgba(0,0,0,0.1)'
       }}>
-        <h2 style={{ color: '#333', marginBottom: '20px', fontSize: '1.8rem' }}>
+        <h2 style={{ margin: '0 0 20px 0', color: '#333', fontSize: '1.8rem' }}>
           📊 系统概览
         </h2>
         
@@ -193,24 +193,24 @@ const Dashboard = () => {
         }}>
           <div style={{ textAlign: 'center', padding: '20px' }}>
             <div style={{ fontSize: '32px', marginBottom: '10px' }}>📝</div>
-            <h4 style={{ margin: '0 0 5px 0', color: '#333' }}>总记录数</h4>
-            <p style={{ color: '#666', margin: '0', fontSize: '24px', fontWeight: 'bold' }}>
+            <h4 style={{ margin: '0 0 5px 0', color: '#333' }}>项目总数</h4>
+            <p style={{ color: '#666', margin: 0, fontSize: '24px', fontWeight: 'bold' }}>
               {statistics.totalRecords}
             </p>
           </div>
           
           <div style={{ textAlign: 'center', padding: '20px' }}>
-            <div style={{ fontSize: '32px', marginBottom: '10px' }}>🏢</div>
-            <h4 style={{ margin: '0 0 5px 0', color: '#333' }}>部门数量</h4>
-            <p style={{ color: '#666', margin: '0', fontSize: '24px', fontWeight: 'bold' }}>
-              {Object.keys(statistics.departmentStats).length}
+            <div style={{ fontSize: '32px', marginBottom: '10px' }}>🎯</div>
+            <h4 style={{ margin: '0 0 5px 0', color: '#333' }}>活跃项目</h4>
+            <p style={{ color: '#666', margin: 0, fontSize: '24px', fontWeight: 'bold' }}>
+              {Object.keys(statistics.projectStats).length}
             </p>
           </div>
           
           <div style={{ textAlign: 'center', padding: '20px' }}>
             <div style={{ fontSize: '32px', marginBottom: '10px' }}>✅</div>
             <h4 style={{ margin: '0 0 5px 0', color: '#333' }}>系统状态</h4>
-            <p style={{ color: '#52c41a', margin: '0', fontSize: '16px', fontWeight: 'bold' }}>
+            <p style={{ color: '#52c41a', margin: 0, fontSize: '16px', fontWeight: 'bold' }}>
               正常运行
             </p>
           </div>
