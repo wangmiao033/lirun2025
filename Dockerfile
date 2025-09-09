@@ -13,9 +13,9 @@ RUN npm install --production
 # 复制源代码
 COPY . .
 
-# 构建前端
+# 构建前端 - 使用Vite
 WORKDIR /app/client
-RUN npm install --production
+RUN npm install
 RUN npm run build
 
 # 回到根目录
