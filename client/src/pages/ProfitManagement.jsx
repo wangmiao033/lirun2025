@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 
 const ProfitManagement = () => {
   const [projects, setProjects] = useState([]);
+  const [filteredProjects, setFilteredProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('date');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [formData, setFormData] = useState({
     projectName: '',
     companyRevenue: '',
@@ -28,6 +32,10 @@ const ProfitManagement = () => {
     fetchProjects();
   }, []);
 
+  useEffect(() => {
+    filterAndSortProjects();
+  }, [projects, searchTerm, sortBy, sortOrder]);
+
   const fetchProjects = async () => {
     try {
       const response = await fetch('/api/projects');
@@ -40,6 +48,31 @@ const ProfitManagement = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const filterAndSortProjects = () => {
+    let filtered = projects.filter(project => 
+      project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      project.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    filtered.sort((a, b) => {
+      let aValue = a[sortBy];
+      let bValue = b[sortBy];
+      
+      if (sortBy === 'date') {
+        aValue = new Date(aValue);
+        bValue = new Date(bValue);
+      }
+      
+      if (sortOrder === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
+
+    setFilteredProjects(filtered);
   };
 
   const handleSubmit = async (e) => {
@@ -179,6 +212,74 @@ const ProfitManagement = () => {
         </button>
       </div>
 
+      {/* 搜索和排序控件 */}
+      <div style={{
+        backgroundColor: '#fff',
+        padding: '20px',
+        borderRadius: '12px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        marginBottom: '30px',
+        display: 'flex',
+        gap: '20px',
+        alignItems: 'center',
+        flexWrap: 'wrap'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label style={{ fontWeight: 'bold', color: '#333' }}>搜索:</label>
+          <input
+            type="text"
+            placeholder="搜索项目名称或描述..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              padding: '8px 12px',
+              border: '1px solid #d9d9d9',
+              borderRadius: '6px',
+              fontSize: '14px',
+              minWidth: '200px'
+            }}
+          />
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <label style={{ fontWeight: 'bold', color: '#333' }}>排序:</label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            style={{
+              padding: '8px 12px',
+              border: '1px solid #d9d9d9',
+              borderRadius: '6px',
+              fontSize: '14px'
+            }}
+          >
+            <option value="date">日期</option>
+            <option value="projectName">项目名称</option>
+            <option value="companyRevenue">公司收入</option>
+            <option value="grossProfit">毛利</option>
+            <option value="grossProfitRate">毛利率</option>
+          </select>
+          
+          <select
+            value={sortOrder}
+            onChange={(e) => setSortOrder(e.target.value)}
+            style={{
+              padding: '8px 12px',
+              border: '1px solid #d9d9d9',
+              borderRadius: '6px',
+              fontSize: '14px'
+            }}
+          >
+            <option value="desc">降序</option>
+            <option value="asc">升序</option>
+          </select>
+        </div>
+        
+        <div style={{ marginLeft: 'auto', color: '#666', fontSize: '14px' }}>
+          共 {filteredProjects.length} 个项目
+        </div>
+      </div>
+
       {/* 项目卡片列表 */}
       <div style={{
         display: 'grid',
@@ -186,7 +287,7 @@ const ProfitManagement = () => {
         gap: '24px',
         marginBottom: '30px'
       }}>
-        {projects.map((project) => (
+        {filteredProjects.map((project) => (
           <div key={project.id} style={{
             backgroundColor: '#fff',
             padding: '24px',
