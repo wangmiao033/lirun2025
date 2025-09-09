@@ -10,13 +10,8 @@
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.0",
-    "axios": "^1.5.0",
-    "react-router-dom": "^6.15.0",
     "antd": "^5.8.0",
-    "@ant-design/icons": "^5.2.0",
-    "recharts": "^2.8.0",
-    "dayjs": "^1.11.0",
-    "react-query": "^3.39.0"
+    "@ant-design/icons": "^5.2.0"
   },
   "scripts": {
     "start": "react-scripts start",
