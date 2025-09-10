@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const AdvertisingManagement = () => {
   const [advertisingFees, setAdvertisingFees] = useState([]);
+  const [games, setGames] = useState([]);
   const [statistics, setStatistics] = useState({
     totalCampaigns: 0,
     totalBudget: 0,
@@ -20,6 +21,7 @@ const AdvertisingManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingAdvertising, setEditingAdvertising] = useState(null);
   const [formData, setFormData] = useState({
+    gameId: '',
     campaignName: '',
     platform: '',
     adType: '',
@@ -27,7 +29,6 @@ const AdvertisingManagement = () => {
     budget: '',
     startDate: '',
     endDate: '',
-    project: '',
     description: ''
   });
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,6 +49,7 @@ const AdvertisingManagement = () => {
   useEffect(() => {
     fetchAdvertisingFees();
     fetchStatistics();
+    fetchGames();
   }, []);
 
   const fetchAdvertisingFees = async () => {
@@ -73,6 +75,18 @@ const AdvertisingManagement = () => {
       }
     } catch (error) {
       console.error('获取广告费统计失败:', error);
+    }
+  };
+
+  const fetchGames = async () => {
+    try {
+      const response = await fetch('/api/games');
+      const result = await response.json();
+      if (result.success) {
+        setGames(result.data);
+      }
+    } catch (error) {
+      console.error('获取游戏列表失败:', error);
     }
   };
 
@@ -109,6 +123,7 @@ const AdvertisingManagement = () => {
 
   const resetForm = () => {
     setFormData({
+      gameId: '',
       campaignName: '',
       platform: '',
       adType: '',
@@ -116,7 +131,6 @@ const AdvertisingManagement = () => {
       budget: '',
       startDate: '',
       endDate: '',
-      project: '',
       description: ''
     });
   };
@@ -124,6 +138,7 @@ const AdvertisingManagement = () => {
   const handleEdit = (advertising) => {
     setEditingAdvertising(advertising);
     setFormData({
+      gameId: advertising.gameId?.toString() || '',
       campaignName: advertising.campaignName,
       platform: advertising.platform,
       adType: advertising.adType,
@@ -131,7 +146,6 @@ const AdvertisingManagement = () => {
       budget: advertising.budget.toString(),
       startDate: advertising.startDate,
       endDate: advertising.endDate,
-      project: advertising.project,
       description: advertising.description
     });
     setShowModal(true);
@@ -374,12 +388,12 @@ const AdvertisingManagement = () => {
   const filteredAdvertisingFees = advertisingFees.filter(advertising => {
     const matchesSearch = !searchTerm || 
       advertising.campaignName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      advertising.project.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (advertising.game && advertising.game.gameName.toLowerCase().includes(searchTerm.toLowerCase())) ||
       advertising.description.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesPlatform = !filterPlatform || advertising.platform === filterPlatform;
     const matchesStatus = !filterStatus || advertising.status === filterStatus;
-    const matchesProject = !filterProject || advertising.project === filterProject;
+    const matchesProject = !filterProject || (advertising.game && advertising.game.gameName === filterProject);
     
     return matchesSearch && matchesPlatform && matchesStatus && matchesProject;
   });
@@ -387,7 +401,7 @@ const AdvertisingManagement = () => {
   // 获取唯一的平台列表
   const uniquePlatforms = [...new Set(advertisingFees.map(ad => ad.platform))];
   // 获取唯一的项目列表
-  const uniqueProjects = [...new Set(advertisingFees.map(ad => ad.project).filter(Boolean))];
+  const uniqueProjects = [...new Set(advertisingFees.map(ad => ad.game?.gameName).filter(Boolean))];
 
   if (loading) {
     return (
@@ -461,7 +475,7 @@ const AdvertisingManagement = () => {
             </label>
             <input
               type="text"
-              placeholder="搜索活动名称、项目或描述..."
+              placeholder="搜索活动名称、游戏或描述..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -520,7 +534,7 @@ const AdvertisingManagement = () => {
           
           <div>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px' }}>
-              🎮 项目
+              🎮 游戏
             </label>
             <select
               value={filterProject}
@@ -533,7 +547,7 @@ const AdvertisingManagement = () => {
                 fontSize: '14px'
               }}
             >
-              <option value="">全部项目</option>
+              <option value="">全部游戏</option>
               {uniqueProjects.map(project => (
                 <option key={project} value={project}>{project}</option>
               ))}
@@ -896,7 +910,7 @@ const AdvertisingManagement = () => {
                 </th>
                 <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>活动名称</th>
                 <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>平台</th>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>项目</th>
+                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>游戏</th>
                 <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>预算</th>
                 <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>已花费</th>
                 <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>剩余</th>
@@ -931,7 +945,24 @@ const AdvertisingManagement = () => {
                       <div style={{ fontSize: '12px', color: '#666' }}>{advertising.adType}</div>
                     </div>
                   </td>
-                  <td style={{ padding: '16px' }}>{advertising.project}</td>
+                  <td style={{ padding: '16px' }}>
+                    <div style={{ 
+                      fontWeight: '600', 
+                      color: '#2c3e50',
+                      fontSize: '15px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span style={{ fontSize: '18px' }}>{advertising.game?.icon || '🎮'}</span>
+                      <div>
+                        <div style={{ fontWeight: '600' }}>{advertising.game?.gameName || '未知游戏'}</div>
+                        <div style={{ fontSize: '12px', color: '#7f8c8d' }}>
+                          {advertising.game?.category} | {advertising.game?.platform}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
                   <td style={{ padding: '16px', textAlign: 'right', color: '#1890ff', fontWeight: 'bold' }}>
                     {formatCurrency(advertising.budget)}
                   </td>
@@ -1186,12 +1217,12 @@ const AdvertisingManagement = () => {
                 
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    项目
+                    选择游戏 *
                   </label>
-                  <input
-                    type="text"
-                    value={formData.project}
-                    onChange={(e) => setFormData({...formData, project: e.target.value})}
+                  <select
+                    value={formData.gameId}
+                    onChange={(e) => setFormData({...formData, gameId: e.target.value})}
+                    required
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -1199,7 +1230,14 @@ const AdvertisingManagement = () => {
                       borderRadius: '6px',
                       fontSize: '14px'
                     }}
-                  />
+                  >
+                    <option value="">请选择游戏</option>
+                    {games.map(game => (
+                      <option key={game.id} value={game.id}>
+                        {game.icon} {game.gameName} - {game.category}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               

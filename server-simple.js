@@ -20,7 +20,7 @@ const upload = multer({ storage: storage });
 let projects = [
   {
     id: 1,
-    projectName: '王者荣耀充值项目',
+    gameId: 1, // 关联王者荣耀
     companyRevenue: 1000000,
     gameRechargeFlow: 800000,
     abnormalRefund: 50000,
@@ -43,7 +43,7 @@ let projects = [
   },
   {
     id: 2,
-    projectName: '和平精英推广项目',
+    gameId: 2, // 关联和平精英
     companyRevenue: 800000,
     gameRechargeFlow: 600000,
     abnormalRefund: 30000,
@@ -63,6 +63,29 @@ let projects = [
     revenue: 800000,
     date: '2024-12-02',
     description: '和平精英游戏推广和充值项目'
+  },
+  {
+    id: 3,
+    gameId: 5, // 关联圣树唤歌
+    companyRevenue: 500000,
+    gameRechargeFlow: 400000,
+    abnormalRefund: 20000,
+    testFee: 5000,
+    voucher: 10000,
+    channel: 15000,
+    withholdingTaxRate: 0.06,
+    sharing: 100000, // 研发20%
+    sharingRatio: 0.2,
+    productCost: 80000,
+    prepaid: 20000,
+    server: 30000,
+    advertisingFee: 40000,
+    costTotal: 170000,
+    grossProfit: 330000,
+    grossProfitRate: 66.0,
+    revenue: 500000,
+    date: '2024-12-03',
+    description: '圣树唤歌充值流水项目'
   }
 ];
 
@@ -507,6 +530,7 @@ let channels = [
 let advertisingFees = [
   {
     id: 1,
+    gameId: 1, // 关联王者荣耀
     campaignName: '王者荣耀春节推广',
     platform: '腾讯广告',
     adType: '信息流广告',
@@ -517,7 +541,6 @@ let advertisingFees = [
     startDate: '2024-01-20',
     endDate: '2024-02-20',
     status: '进行中',
-    project: '王者荣耀',
     impressions: 1000000,
     clicks: 50000,
     conversions: 5000,
@@ -528,6 +551,7 @@ let advertisingFees = [
   },
   {
     id: 2,
+    gameId: 2, // 关联和平精英
     campaignName: '和平精英夏日活动',
     platform: '字节跳动',
     adType: '视频广告',
@@ -538,7 +562,6 @@ let advertisingFees = [
     startDate: '2024-07-01',
     endDate: '2024-08-31',
     status: '进行中',
-    project: '和平精英',
     impressions: 2000000,
     clicks: 80000,
     conversions: 8000,
@@ -549,24 +572,24 @@ let advertisingFees = [
   },
   {
     id: 3,
-    campaignName: '新游戏预热推广',
-    platform: '百度推广',
-    adType: '搜索广告',
-    targetAudience: '游戏爱好者',
+    gameId: 5, // 关联圣树唤歌
+    campaignName: '圣树唤歌奇幻冒险',
+    platform: 'B站推广',
+    adType: 'UP主合作',
+    targetAudience: 'RPG游戏爱好者',
     budget: 30000,
     spent: 30000,
     remaining: 0,
     startDate: '2024-09-01',
     endDate: '2024-09-30',
     status: '已完成',
-    project: '新游戏',
     impressions: 500000,
     clicks: 25000,
     conversions: 2500,
     ctr: 5.0,
     cpc: 1.2,
     cpa: 12.0,
-    description: '新游戏上线前的预热推广'
+    description: '圣树唤歌奇幻RPG游戏推广'
   }
 ];
 
@@ -674,10 +697,19 @@ app.delete('/api/games/:id', (req, res) => {
 
 // 获取所有项目数据
 app.get('/api/projects', (req, res) => {
+  // 返回关联游戏信息的项目
+  const projectsWithGames = projects.map(project => {
+    const game = games.find(g => g.id === project.gameId);
+    return {
+      ...project,
+      game: game || null
+    };
+  });
+  
   res.json({
     success: true,
-    data: projects,
-    total: projects.length
+    data: projectsWithGames,
+    total: projectsWithGames.length
   });
 });
 
@@ -702,15 +734,24 @@ app.get('/api/projects/:id', (req, res) => {
 // 创建新的项目数据
 app.post('/api/projects', (req, res) => {
   const {
-    projectName, companyRevenue, gameRechargeFlow, abnormalRefund, testFee,
+    gameId, companyRevenue, gameRechargeFlow, abnormalRefund, testFee,
     voucher, channel, withholdingTaxRate, sharing, sharingRatio,
     productCost, prepaid, server, advertisingFee, date, description
   } = req.body;
   
-  if (!projectName || !companyRevenue || !date) {
+  if (!gameId || !companyRevenue || !date) {
     return res.status(400).json({
       success: false,
       message: '缺少必填字段'
+    });
+  }
+  
+  // 检查游戏是否存在
+  const game = games.find(g => g.id === parseInt(gameId));
+  if (!game) {
+    return res.status(400).json({
+      success: false,
+      message: '选择的游戏不存在'
     });
   }
   
@@ -725,7 +766,7 @@ app.post('/api/projects', (req, res) => {
   
   const newProject = {
     id: projects.length + 1,
-    projectName,
+    gameId: parseInt(gameId),
     companyRevenue: parseFloat(companyRevenue),
     gameRechargeFlow: parseFloat(gameRechargeFlow) || 0,
     abnormalRefund: parseFloat(abnormalRefund) || 0,
@@ -1441,27 +1482,46 @@ app.delete('/api/channels/:id', (req, res) => {
 
 // 广告费管理API
 app.get('/api/advertising-fees', (req, res) => {
+  // 返回关联游戏信息的广告费
+  const advertisingFeesWithGames = advertisingFees.map(ad => {
+    const game = games.find(g => g.id === ad.gameId);
+    return {
+      ...ad,
+      game: game || null
+    };
+  });
+  
   res.json({
     success: true,
-    data: advertisingFees,
-    total: advertisingFees.length
+    data: advertisingFeesWithGames,
+    total: advertisingFeesWithGames.length
   });
 });
 
 app.post('/api/advertising-fees', (req, res) => {
   const {
-    campaignName, platform, adType, targetAudience, budget, startDate, endDate, project, description
+    gameId, campaignName, platform, adType, targetAudience, budget, startDate, endDate, description
   } = req.body;
   
-  if (!campaignName || !platform || !budget) {
+  if (!gameId || !campaignName || !platform || !budget) {
     return res.status(400).json({
       success: false,
       message: '缺少必填字段'
     });
   }
   
+  // 检查游戏是否存在
+  const game = games.find(g => g.id === parseInt(gameId));
+  if (!game) {
+    return res.status(400).json({
+      success: false,
+      message: '选择的游戏不存在'
+    });
+  }
+  
   const newAdvertisingFee = {
     id: advertisingFees.length + 1,
+    gameId: parseInt(gameId),
     campaignName,
     platform,
     adType: adType || '',
@@ -1472,7 +1532,6 @@ app.post('/api/advertising-fees', (req, res) => {
     startDate: startDate || new Date().toISOString().split('T')[0],
     endDate: endDate || '',
     status: '未开始',
-    project: project || '',
     impressions: 0,
     clicks: 0,
     conversions: 0,

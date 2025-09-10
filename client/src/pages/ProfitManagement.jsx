@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const ProfitManagement = () => {
   const [projects, setProjects] = useState([]);
+  const [games, setGames] = useState([]);
   const [filteredProjects, setFilteredProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -10,7 +11,7 @@ const ProfitManagement = () => {
   const [sortBy, setSortBy] = useState('date');
   const [sortOrder, setSortOrder] = useState('desc');
   const [formData, setFormData] = useState({
-    projectName: '',
+    gameId: '',
     companyRevenue: '',
     gameRechargeFlow: '',
     abnormalRefund: '',
@@ -30,6 +31,7 @@ const ProfitManagement = () => {
 
   useEffect(() => {
     fetchProjects();
+    fetchGames();
   }, []);
 
   useEffect(() => {
@@ -50,15 +52,27 @@ const ProfitManagement = () => {
     }
   };
 
+  const fetchGames = async () => {
+    try {
+      const response = await fetch('/api/games');
+      const result = await response.json();
+      if (result.success) {
+        setGames(result.data);
+      }
+    } catch (error) {
+      console.error('获取游戏列表失败:', error);
+    }
+  };
+
   const filterAndSortProjects = () => {
     let filtered = projects.filter(project => 
-      project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (project.game && project.game.gameName.toLowerCase().includes(searchTerm.toLowerCase())) ||
       project.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     filtered.sort((a, b) => {
-      let aValue = a[sortBy];
-      let bValue = b[sortBy];
+      let aValue = sortBy === 'gameName' ? (a.game?.gameName || '') : a[sortBy];
+      let bValue = sortBy === 'gameName' ? (b.game?.gameName || '') : b[sortBy];
       
       if (sortBy === 'date') {
         aValue = new Date(aValue);
@@ -107,7 +121,7 @@ const ProfitManagement = () => {
 
   const resetForm = () => {
     setFormData({
-      projectName: '',
+      gameId: '',
       companyRevenue: '',
       gameRechargeFlow: '',
       abnormalRefund: '',
@@ -129,7 +143,7 @@ const ProfitManagement = () => {
   const handleEdit = (project) => {
     setEditingProject(project);
     setFormData({
-      projectName: project.projectName,
+      gameId: project.gameId?.toString() || '',
       companyRevenue: project.companyRevenue.toString(),
       gameRechargeFlow: project.gameRechargeFlow.toString(),
       abnormalRefund: project.abnormalRefund.toString(),
@@ -228,7 +242,7 @@ const ProfitManagement = () => {
           <label style={{ fontWeight: 'bold', color: '#333' }}>搜索:</label>
           <input
             type="text"
-            placeholder="搜索项目名称或描述..."
+            placeholder="搜索游戏名称或描述..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             style={{
@@ -254,7 +268,7 @@ const ProfitManagement = () => {
             }}
           >
             <option value="date">日期</option>
-            <option value="projectName">项目名称</option>
+            <option value="gameName">游戏名称</option>
             <option value="companyRevenue">公司收入</option>
             <option value="grossProfit">毛利</option>
             <option value="grossProfitRate">毛利率</option>
@@ -302,7 +316,8 @@ const ProfitManagement = () => {
               marginBottom: '16px'
             }}>
               <h3 style={{ margin: 0, color: '#333', fontSize: '18px' }}>
-                🎯 {project.projectName}
+                <span style={{ fontSize: '20px', marginRight: '8px' }}>{project.game?.icon || '🎮'}</span>
+                {project.game?.gameName || '未知游戏'}
               </h3>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button
@@ -416,12 +431,11 @@ const ProfitManagement = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    项目名称 *
+                    选择游戏 *
                   </label>
-                  <input
-                    type="text"
-                    value={formData.projectName}
-                    onChange={(e) => setFormData({...formData, projectName: e.target.value})}
+                  <select
+                    value={formData.gameId}
+                    onChange={(e) => setFormData({...formData, gameId: e.target.value})}
                     required
                     style={{
                       width: '100%',
@@ -430,7 +444,14 @@ const ProfitManagement = () => {
                       borderRadius: '6px',
                       fontSize: '14px'
                     }}
-                  />
+                  >
+                    <option value="">请选择游戏</option>
+                    {games.map(game => (
+                      <option key={game.id} value={game.id}>
+                        {game.icon} {game.gameName} - {game.category}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 
                 <div>
