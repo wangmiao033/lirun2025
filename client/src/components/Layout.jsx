@@ -97,82 +97,132 @@ const Layout = ({ children }) => {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
+    <div style={{ 
+      display: 'flex', 
+      minHeight: '100vh', 
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
+    }}>
       {/* 侧边栏 */}
       <div style={{
-        width: collapsed ? '80px' : '250px',
-        backgroundColor: '#fff',
-        boxShadow: '2px 0 8px rgba(0, 0, 0, 0.1)',
-        transition: 'width 0.3s',
+        width: collapsed ? '80px' : '280px',
+        background: 'linear-gradient(180deg, #2c3e50 0%, #34495e 100%)',
+        boxShadow: '4px 0 20px rgba(0, 0, 0, 0.3)',
+        transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         position: 'fixed',
         height: '100vh',
-        zIndex: 1000
+        zIndex: 1000,
+        borderRight: '1px solid rgba(255, 255, 255, 0.1)'
       }}>
         {/* 头部 */}
         <div style={{
-          padding: '20px',
+          padding: '24px 20px',
           textAlign: 'center',
-          borderBottom: '1px solid #f0f0f0',
-          height: '80px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+          height: '90px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)'
         }}>
           <button
             onClick={() => setCollapsed(!collapsed)}
             style={{
-              background: 'none',
-              border: 'none',
-              fontSize: '20px',
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              fontSize: '18px',
               cursor: 'pointer',
-              padding: '8px',
-              borderRadius: '4px',
-              marginRight: collapsed ? '0' : '10px'
+              padding: '10px',
+              borderRadius: '8px',
+              marginRight: collapsed ? '0' : '12px',
+              color: '#fff',
+              transition: 'all 0.3s ease',
+              backdropFilter: 'blur(10px)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = 'rgba(255, 255, 255, 0.2)';
+              e.target.style.transform = 'scale(1.05)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+              e.target.style.transform = 'scale(1)';
             }}
           >
             {collapsed ? '☰' : '✕'}
           </button>
           {!collapsed && (
-            <h2 style={{ margin: 0, color: '#1890ff', fontSize: '18px' }}>
+            <h2 style={{ 
+              margin: 0, 
+              color: '#fff', 
+              fontSize: '20px',
+              fontWeight: '600',
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+              letterSpacing: '0.5px'
+            }}>
               利润管理系统
             </h2>
           )}
         </div>
 
         {/* 菜单 */}
-        <div style={{ padding: '20px 0' }}>
+        <div style={{ padding: '16px 0' }}>
           {menuItems.map(item => (
             <div key={item.key}>
               {/* 主菜单项 */}
               <div
                 onClick={() => handleMenuClick(item.key, item.hasChildren)}
                 style={{
-                  padding: '15px 20px',
+                  padding: '16px 24px',
                   cursor: 'pointer',
-                  backgroundColor: location.pathname === item.key ? '#e6f7ff' : 'transparent',
-                  borderRight: location.pathname === item.key ? '3px solid #1890ff' : '3px solid transparent',
+                  backgroundColor: location.pathname === item.key ? 'rgba(52, 152, 219, 0.2)' : 'transparent',
+                  borderRight: location.pathname === item.key ? '4px solid #3498db' : '4px solid transparent',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
-                  transition: 'all 0.3s',
-                  color: location.pathname === item.key ? '#1890ff' : '#333'
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  color: location.pathname === item.key ? '#3498db' : '#ecf0f1',
+                  margin: '4px 12px',
+                  borderRadius: '12px',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+                onMouseEnter={(e) => {
+                  if (location.pathname !== item.key) {
+                    e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    e.target.style.transform = 'translateX(4px)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (location.pathname !== item.key) {
+                    e.target.style.backgroundColor = 'transparent';
+                    e.target.style.transform = 'translateX(0)';
+                  }
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ fontSize: '18px', marginRight: collapsed ? '0' : '12px' }}>
+                  <span style={{ 
+                    fontSize: '20px', 
+                    marginRight: collapsed ? '0' : '16px',
+                    filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))'
+                  }}>
                     {item.icon}
                   </span>
                   {!collapsed && (
-                    <span style={{ fontSize: '14px', fontWeight: location.pathname === item.key ? 'bold' : 'normal' }}>
+                    <span style={{ 
+                      fontSize: '15px', 
+                      fontWeight: location.pathname === item.key ? '600' : '400',
+                      letterSpacing: '0.3px'
+                    }}>
                       {item.label}
                     </span>
                   )}
                 </div>
                 {!collapsed && item.hasChildren && (
                   <span style={{ 
-                    fontSize: '12px', 
+                    fontSize: '14px', 
                     transform: expandedMenus[item.key] ? 'rotate(90deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.3s ease'
+                    transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    color: '#bdc3c7'
                   }}>
                     ▶
                   </span>
@@ -181,27 +231,53 @@ const Layout = ({ children }) => {
               
               {/* 子菜单 */}
               {!collapsed && item.hasChildren && expandedMenus[item.key] && (
-                <div style={{ backgroundColor: '#f8f9fa' }}>
+                <div style={{ 
+                  background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.05) 100%)',
+                  margin: '0 12px',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  backdropFilter: 'blur(10px)'
+                }}>
                   {item.children.map(child => (
                     <div
                       key={child.key}
                       onClick={() => handleMenuClick(child.key, false)}
                       style={{
-                        padding: '12px 20px 12px 50px',
+                        padding: '14px 24px 14px 60px',
                         cursor: 'pointer',
-                        backgroundColor: location.pathname === child.key ? '#e6f7ff' : 'transparent',
-                        borderRight: location.pathname === child.key ? '3px solid #1890ff' : '3px solid transparent',
+                        backgroundColor: location.pathname === child.key ? 'rgba(52, 152, 219, 0.3)' : 'transparent',
+                        borderRight: location.pathname === child.key ? '3px solid #3498db' : '3px solid transparent',
                         display: 'flex',
                         alignItems: 'center',
-                        transition: 'all 0.3s',
-                        color: location.pathname === child.key ? '#1890ff' : '#666',
-                        fontSize: '13px'
+                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                        color: location.pathname === child.key ? '#3498db' : '#bdc3c7',
+                        fontSize: '14px',
+                        position: 'relative'
+                      }}
+                      onMouseEnter={(e) => {
+                        if (location.pathname !== child.key) {
+                          e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                          e.target.style.color = '#ecf0f1';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (location.pathname !== child.key) {
+                          e.target.style.backgroundColor = 'transparent';
+                          e.target.style.color = '#bdc3c7';
+                        }
                       }}
                     >
-                      <span style={{ fontSize: '16px', marginRight: '8px' }}>
+                      <span style={{ 
+                        fontSize: '16px', 
+                        marginRight: '12px',
+                        filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))'
+                      }}>
                         {child.icon}
                       </span>
-                      <span style={{ fontWeight: location.pathname === child.key ? 'bold' : 'normal' }}>
+                      <span style={{ 
+                        fontWeight: location.pathname === child.key ? '500' : '400',
+                        letterSpacing: '0.2px'
+                      }}>
                         {child.label}
                       </span>
                     </div>
@@ -215,63 +291,124 @@ const Layout = ({ children }) => {
 
       {/* 主内容区 */}
       <div style={{
-        marginLeft: collapsed ? '80px' : '250px',
+        marginLeft: collapsed ? '80px' : '280px',
         flex: 1,
-        transition: 'margin-left 0.3s'
+        transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+        minHeight: '100vh'
       }}>
         {/* 顶部导航栏 */}
         <div style={{
-          backgroundColor: '#fff',
-          padding: '0 30px',
-          height: '80px',
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%)',
+          backdropFilter: 'blur(20px)',
+          padding: '0 40px',
+          height: '90px',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
           position: 'sticky',
           top: 0,
-          zIndex: 999
+          zIndex: 999,
+          borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
         }}>
-          <h1 style={{ margin: 0, color: '#333', fontSize: '24px' }}>
-            {(() => {
-              // 查找当前路径对应的菜单项
-              for (const item of menuItems) {
-                if (item.key === location.pathname) {
-                  return item.label;
-                }
-                if (item.children) {
-                  const child = item.children.find(child => child.key === location.pathname);
-                  if (child) {
-                    return child.label;
+          <div>
+            <h1 style={{ 
+              margin: 0, 
+              color: '#2c3e50', 
+              fontSize: '28px',
+              fontWeight: '700',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}>
+              {(() => {
+                // 查找当前路径对应的菜单项
+                for (const item of menuItems) {
+                  if (item.key === location.pathname) {
+                    return item.label;
+                  }
+                  if (item.children) {
+                    const child = item.children.find(child => child.key === location.pathname);
+                    if (child) {
+                      return child.label;
+                    }
                   }
                 }
-              }
-              return '仪表盘';
-            })()}
-          </h1>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-            <span style={{ color: '#666', fontSize: '14px' }}>
-              {new Date().toLocaleDateString('zh-CN')}
-            </span>
+                return '仪表盘';
+              })()}
+            </h1>
+            <p style={{ 
+              margin: '4px 0 0 0', 
+              color: '#7f8c8d', 
+              fontSize: '14px',
+              fontWeight: '400'
+            }}>
+              {new Date().toLocaleDateString('zh-CN', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+              })}
+            </p>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
             <div style={{
-              width: '40px',
-              height: '40px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '8px 16px',
+              background: 'rgba(255, 255, 255, 0.6)',
+              borderRadius: '20px',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              backdropFilter: 'blur(10px)'
+            }}>
+              <div style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: '#27ae60',
+                animation: 'pulse 2s infinite'
+              }}></div>
+              <span style={{ color: '#2c3e50', fontSize: '14px', fontWeight: '500' }}>
+                系统运行正常
+              </span>
+            </div>
+            <div style={{
+              width: '48px',
+              height: '48px',
               borderRadius: '50%',
-              backgroundColor: '#1890ff',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
-              fontSize: '16px',
-              fontWeight: 'bold'
-            }}>
+              fontSize: '18px',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'scale(1.1)';
+              e.target.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.6)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'scale(1)';
+              e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+            }}
+            >
               管
             </div>
           </div>
         </div>
 
         {/* 页面内容 */}
-        <div style={{ padding: '30px' }}>
+        <div style={{ 
+          padding: '40px',
+          minHeight: 'calc(100vh - 90px)'
+        }}>
           {children}
         </div>
       </div>
