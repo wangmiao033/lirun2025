@@ -9,8 +9,6 @@ import PrepaymentManagement from './pages/PrepaymentManagement';
 import AdvertisingManagement from './pages/AdvertisingManagement';
 import BillingManagement from './pages/BillingManagement';
 import DepartmentManagement from './pages/DepartmentManagement';
-import ResearchManagement from './pages/ResearchManagement';
-import ChannelManagement from './pages/ChannelManagement';
 import DataImport from './pages/DataImport';
 import Reports from './pages/Reports';
 
@@ -27,8 +25,6 @@ const App = () => {
           <Route path="/advertising" element={<AdvertisingManagement />} />
           <Route path="/billing" element={<BillingManagement />} />
           <Route path="/departments" element={<DepartmentManagement />} />
-          <Route path="/research" element={<ResearchManagement />} />
-          <Route path="/channels" element={<ChannelManagement />} />
           <Route path="/import" element={<DataImport />} />
           <Route path="/reports" element={<Reports />} />
         </Routes>
