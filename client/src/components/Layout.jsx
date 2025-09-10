@@ -48,6 +48,21 @@ const Layout = ({ children }) => {
       label: '部门管理',
     },
     {
+      key: '/suppliers',
+      icon: '🏢',
+      label: '供应商管理',
+    },
+    {
+      key: '/research',
+      icon: '🔬',
+      label: '研发管理',
+    },
+    {
+      key: '/channels',
+      icon: '📺',
+      label: '渠道管理',
+    },
+    {
       key: '/import',
       icon: '📤',
       label: '数据导入',

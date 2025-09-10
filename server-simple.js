@@ -310,6 +310,105 @@ let bills = [
   }
 ];
 
+// 模拟数据库 - 供应商数据
+let suppliers = [
+  {
+    id: 1,
+    name: '腾讯游戏',
+    type: '研发商',
+    contact: '张三',
+    phone: '13800138001',
+    email: 'zhangsan@tencent.com',
+    address: '深圳市南山区科技园',
+    description: '腾讯游戏研发团队'
+  },
+  {
+    id: 2,
+    name: '华为应用市场',
+    type: '渠道商',
+    contact: '李四',
+    phone: '13800138002',
+    email: 'lisi@huawei.com',
+    address: '深圳市龙岗区华为基地',
+    description: '华为应用市场渠道'
+  },
+  {
+    id: 3,
+    name: '小米应用商店',
+    type: '渠道商',
+    contact: '王五',
+    phone: '13800138003',
+    email: 'wangwu@xiaomi.com',
+    address: '北京市海淀区小米科技园',
+    description: '小米应用商店渠道'
+  }
+];
+
+// 模拟数据库 - 研发项目数据
+let researchProjects = [
+  {
+    id: 1,
+    projectCode: 'RD2025001',
+    projectName: '新游戏引擎开发',
+    manager: '张三',
+    projectType: 'development',
+    budget: 500000,
+    startDate: '2025-01-01',
+    endDate: '2025-12-31',
+    status: 'active',
+    description: '开发下一代游戏引擎'
+  },
+  {
+    id: 2,
+    projectCode: 'RD2025002',
+    projectName: 'AI算法优化',
+    manager: '李四',
+    projectType: 'applied',
+    budget: 300000,
+    startDate: '2025-02-01',
+    endDate: '2025-08-31',
+    status: 'planning',
+    description: '优化游戏AI算法'
+  }
+];
+
+// 模拟数据库 - 渠道数据
+let channels = [
+  {
+    id: 1,
+    name: '华为应用市场',
+    type: 'huawei',
+    manager: '李四',
+    contact: '李四',
+    phone: '13800138002',
+    email: 'lisi@huawei.com',
+    status: 'active',
+    description: '华为应用市场渠道'
+  },
+  {
+    id: 2,
+    name: '小米应用商店',
+    type: 'xiaomi',
+    manager: '王五',
+    contact: '王五',
+    phone: '13800138003',
+    email: 'wangwu@xiaomi.com',
+    status: 'active',
+    description: '小米应用商店渠道'
+  },
+  {
+    id: 3,
+    name: 'OPPO软件商店',
+    type: 'oppo',
+    manager: '赵六',
+    contact: '赵六',
+    phone: '13800138004',
+    email: 'zhaoliu@oppo.com',
+    status: 'testing',
+    description: 'OPPO软件商店渠道'
+  }
+];
+
 // 模拟数据库 - 广告费数据
 let advertisingFees = [
   {
@@ -860,6 +959,253 @@ app.delete('/api/prepayments/:id', (req, res) => {
   res.json({
     success: true,
     message: '预付款删除成功'
+  });
+});
+
+// 供应商管理API
+app.get('/api/suppliers', (req, res) => {
+  res.json({
+    success: true,
+    data: suppliers,
+    total: suppliers.length
+  });
+});
+
+app.post('/api/suppliers', (req, res) => {
+  const { name, type, contact, phone, email, address, description } = req.body;
+  
+  if (!name || !type) {
+    return res.status(400).json({
+      success: false,
+      message: '缺少必填字段'
+    });
+  }
+  
+  const newSupplier = {
+    id: suppliers.length + 1,
+    name,
+    type,
+    contact: contact || '',
+    phone: phone || '',
+    email: email || '',
+    address: address || '',
+    description: description || ''
+  };
+  
+  suppliers.push(newSupplier);
+  
+  res.json({
+    success: true,
+    data: newSupplier,
+    message: '供应商创建成功'
+  });
+});
+
+app.put('/api/suppliers/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const supplierIndex = suppliers.findIndex(s => s.id === id);
+  
+  if (supplierIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '供应商不存在'
+    });
+  }
+  
+  suppliers[supplierIndex] = {
+    ...suppliers[supplierIndex],
+    ...req.body
+  };
+  
+  res.json({
+    success: true,
+    data: suppliers[supplierIndex],
+    message: '供应商更新成功'
+  });
+});
+
+app.delete('/api/suppliers/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const supplierIndex = suppliers.findIndex(s => s.id === id);
+  
+  if (supplierIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '供应商不存在'
+    });
+  }
+  
+  suppliers.splice(supplierIndex, 1);
+  
+  res.json({
+    success: true,
+    message: '供应商删除成功'
+  });
+});
+
+// 研发项目管理API
+app.get('/api/research-projects', (req, res) => {
+  res.json({
+    success: true,
+    data: researchProjects,
+    total: researchProjects.length
+  });
+});
+
+app.post('/api/research-projects', (req, res) => {
+  const { projectCode, projectName, manager, projectType, budget, startDate, endDate, status, description } = req.body;
+  
+  if (!projectCode || !projectName || !manager || !projectType || !status) {
+    return res.status(400).json({
+      success: false,
+      message: '缺少必填字段'
+    });
+  }
+  
+  const newProject = {
+    id: researchProjects.length + 1,
+    projectCode,
+    projectName,
+    manager,
+    projectType,
+    budget: budget ? parseFloat(budget) : 0,
+    startDate: startDate || '',
+    endDate: endDate || '',
+    status,
+    description: description || ''
+  };
+  
+  researchProjects.push(newProject);
+  
+  res.json({
+    success: true,
+    data: newProject,
+    message: '研发项目创建成功'
+  });
+});
+
+app.put('/api/research-projects/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const projectIndex = researchProjects.findIndex(p => p.id === id);
+  
+  if (projectIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '研发项目不存在'
+    });
+  }
+  
+  researchProjects[projectIndex] = {
+    ...researchProjects[projectIndex],
+    ...req.body,
+    budget: req.body.budget ? parseFloat(req.body.budget) : researchProjects[projectIndex].budget
+  };
+  
+  res.json({
+    success: true,
+    data: researchProjects[projectIndex],
+    message: '研发项目更新成功'
+  });
+});
+
+app.delete('/api/research-projects/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const projectIndex = researchProjects.findIndex(p => p.id === id);
+  
+  if (projectIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '研发项目不存在'
+    });
+  }
+  
+  researchProjects.splice(projectIndex, 1);
+  
+  res.json({
+    success: true,
+    message: '研发项目删除成功'
+  });
+});
+
+// 渠道管理API
+app.get('/api/channels', (req, res) => {
+  res.json({
+    success: true,
+    data: channels,
+    total: channels.length
+  });
+});
+
+app.post('/api/channels', (req, res) => {
+  const { name, type, manager, contact, phone, email, status, description } = req.body;
+  
+  if (!name || !type || !manager || !status) {
+    return res.status(400).json({
+      success: false,
+      message: '缺少必填字段'
+    });
+  }
+  
+  const newChannel = {
+    id: channels.length + 1,
+    name,
+    type,
+    manager,
+    contact: contact || '',
+    phone: phone || '',
+    email: email || '',
+    status,
+    description: description || ''
+  };
+  
+  channels.push(newChannel);
+  
+  res.json({
+    success: true,
+    data: newChannel,
+    message: '渠道创建成功'
+  });
+});
+
+app.put('/api/channels/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const channelIndex = channels.findIndex(c => c.id === id);
+  
+  if (channelIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '渠道不存在'
+    });
+  }
+  
+  channels[channelIndex] = {
+    ...channels[channelIndex],
+    ...req.body
+  };
+  
+  res.json({
+    success: true,
+    data: channels[channelIndex],
+    message: '渠道更新成功'
+  });
+});
+
+app.delete('/api/channels/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const channelIndex = channels.findIndex(c => c.id === id);
+  
+  if (channelIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '渠道不存在'
+    });
+  }
+  
+  channels.splice(channelIndex, 1);
+  
+  res.json({
+    success: true,
+    message: '渠道删除成功'
   });
 });
 
