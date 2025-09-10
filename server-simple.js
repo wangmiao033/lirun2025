@@ -401,6 +401,20 @@ let games = [
     description: '英雄联盟正版手游，经典MOBA体验',
     icon: '🏆',
     tags: ['MOBA', '竞技', '策略']
+  },
+  {
+    id: 5,
+    gameName: '圣树唤歌',
+    gameCode: 'SSHG',
+    category: 'RPG',
+    platform: 'Mobile',
+    developer: '广州趣炫网络科技有限公司',
+    publisher: '广州趣炫网络科技有限公司',
+    releaseDate: '2024-01-01',
+    status: 'active',
+    description: '奇幻冒险RPG手游，探索神秘圣树世界',
+    icon: '🌳',
+    tags: ['RPG', '冒险', '奇幻']
   }
 ];
 
@@ -438,6 +452,17 @@ let researchProjects = [
     startDate: '2023-01-01',
     endDate: '2023-12-31',
     description: '原神研发项目'
+  },
+  {
+    id: 4,
+    gameId: 5, // 关联圣树唤歌
+    prepayment: 0,
+    status: 'active',
+    revenueShare: 20, // 研发20%
+    channelFee: 0, // 0%/5% 通道费
+    startDate: '2024-01-01',
+    endDate: '2025-12-31',
+    description: '圣树唤歌研发项目 - 研发商：广州趣炫网络科技有限公司，发行公司分成80%'
   }
 ];
 

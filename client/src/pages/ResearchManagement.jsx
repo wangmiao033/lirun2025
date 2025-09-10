@@ -155,7 +155,10 @@ const ResearchManagement = () => {
   // 筛选逻辑
   const filteredProjects = researchProjects.filter(project => {
     const matchesSearch = !searchTerm || 
-      (project.game && project.game.gameName.toLowerCase().includes(searchTerm.toLowerCase()));
+      (project.game && (
+        project.game.gameName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.game.developer.toLowerCase().includes(searchTerm.toLowerCase())
+      ));
     
     const matchesStatus = !filterStatus || project.status === filterStatus;
     
@@ -261,7 +264,7 @@ const ResearchManagement = () => {
             </label>
             <input
               type="text"
-              placeholder="搜索游戏项目名称..."
+              placeholder="搜索游戏名称或研发商..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -404,7 +407,7 @@ const ResearchManagement = () => {
           <table style={{
             width: '100%',
             borderCollapse: 'collapse',
-            minWidth: '900px'
+            minWidth: '1200px'
           }}>
             <thead>
               <tr style={{ 
@@ -417,7 +420,23 @@ const ResearchManagement = () => {
                   color: '#2c3e50',
                   fontWeight: '600',
                   fontSize: '14px'
-                }}>项目名称</th>
+                }}>游戏项目</th>
+                <th style={{ 
+                  padding: '16px 20px', 
+                  textAlign: 'left', 
+                  borderBottom: '1px solid rgba(102, 126, 234, 0.2)',
+                  color: '#2c3e50',
+                  fontWeight: '600',
+                  fontSize: '14px'
+                }}>研发商</th>
+                <th style={{ 
+                  padding: '16px 20px', 
+                  textAlign: 'center', 
+                  borderBottom: '1px solid rgba(102, 126, 234, 0.2)',
+                  color: '#2c3e50',
+                  fontWeight: '600',
+                  fontSize: '14px'
+                }}>签约日期</th>
                 <th style={{ 
                   padding: '16px 20px', 
                   textAlign: 'right', 
@@ -496,6 +515,28 @@ const ResearchManagement = () => {
                           {project.game?.category} | {project.game?.platform}
                         </div>
                       </div>
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px 20px' }}>
+                    <div style={{ 
+                      fontWeight: '500', 
+                      color: '#2c3e50',
+                      fontSize: '14px'
+                    }}>
+                      {project.game?.developer || '未知研发商'}
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px 20px', textAlign: 'center' }}>
+                    <div style={{ 
+                      fontWeight: '500', 
+                      color: '#7f8c8d',
+                      fontSize: '14px',
+                      background: 'rgba(102, 126, 234, 0.1)',
+                      padding: '4px 8px',
+                      borderRadius: '8px',
+                      display: 'inline-block'
+                    }}>
+                      {project.startDate || '未设置'}
                     </div>
                   </td>
                   <td style={{ padding: '16px 20px', textAlign: 'right' }}>
