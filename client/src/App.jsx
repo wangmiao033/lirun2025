@@ -23,6 +23,7 @@ import DataImport from './pages/DataImport';
 import Reports from './pages/Reports';
 import AdvancedAnalytics from './pages/AdvancedAnalytics';
 import BackupManagement from './pages/BackupManagement';
+import Test from './pages/Test';
 
 const App = () => {
   return (
@@ -31,6 +32,7 @@ const App = () => {
         <NotificationProvider>
           <Router>
             <Routes>
+              <Route path="/test" element={<Test />} />
               <Route path="/login" element={<Login />} />
               <Route path="/" element={
                 <ProtectedRoute>
