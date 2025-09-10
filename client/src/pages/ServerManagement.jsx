@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const ServerManagement = () => {
   const [servers, setServers] = useState([]);
+  const [games, setGames] = useState([]);
   const [statistics, setStatistics] = useState({
     totalServers: 0,
     runningServers: 0,
@@ -13,9 +14,9 @@ const ServerManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingServer, setEditingServer] = useState(null);
   const [formData, setFormData] = useState({
+    gameId: '',
     serverName: '',
     instanceId: '',
-    game: '',
     region: '',
     instanceType: '',
     cpu: '',
@@ -32,6 +33,7 @@ const ServerManagement = () => {
   useEffect(() => {
     fetchServers();
     fetchStatistics();
+    fetchGames();
   }, []);
 
   const fetchServers = async () => {
@@ -57,6 +59,18 @@ const ServerManagement = () => {
       }
     } catch (error) {
       console.error('获取服务器统计失败:', error);
+    }
+  };
+
+  const fetchGames = async () => {
+    try {
+      const response = await fetch('/api/games');
+      const result = await response.json();
+      if (result.success) {
+        setGames(result.data);
+      }
+    } catch (error) {
+      console.error('获取游戏列表失败:', error);
     }
   };
 
@@ -93,9 +107,9 @@ const ServerManagement = () => {
 
   const resetForm = () => {
     setFormData({
+      gameId: '',
       serverName: '',
       instanceId: '',
-      game: '',
       region: '',
       instanceType: '',
       cpu: '',
@@ -113,9 +127,9 @@ const ServerManagement = () => {
   const handleEdit = (server) => {
     setEditingServer(server);
     setFormData({
+      gameId: server.gameId?.toString() || '',
       serverName: server.serverName,
       instanceId: server.instanceId,
-      game: server.game,
       region: server.region,
       instanceType: server.instanceType,
       cpu: server.cpu,
@@ -355,7 +369,24 @@ const ServerManagement = () => {
                   <td style={{ padding: '16px', fontFamily: 'monospace', fontSize: '12px' }}>
                     {server.instanceId}
                   </td>
-                  <td style={{ padding: '16px' }}>{server.game}</td>
+                  <td style={{ padding: '16px' }}>
+                    <div style={{ 
+                      fontWeight: '600', 
+                      color: '#2c3e50',
+                      fontSize: '15px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span style={{ fontSize: '18px' }}>{server.game?.icon || '🎮'}</span>
+                      <div>
+                        <div style={{ fontWeight: '600' }}>{server.game?.gameName || '未知游戏'}</div>
+                        <div style={{ fontSize: '12px', color: '#7f8c8d' }}>
+                          {server.game?.category} | {server.game?.platform}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
                   <td style={{ padding: '16px' }}>
                     <div style={{ fontSize: '12px' }}>
                       <div>{server.instanceType}</div>
@@ -487,12 +518,12 @@ const ServerManagement = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    游戏
+                    选择游戏 *
                   </label>
-                  <input
-                    type="text"
-                    value={formData.game}
-                    onChange={(e) => setFormData({...formData, game: e.target.value})}
+                  <select
+                    value={formData.gameId}
+                    onChange={(e) => setFormData({...formData, gameId: e.target.value})}
+                    required
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -500,7 +531,14 @@ const ServerManagement = () => {
                       borderRadius: '6px',
                       fontSize: '14px'
                     }}
-                  />
+                  >
+                    <option value="">请选择游戏</option>
+                    {games.map(game => (
+                      <option key={game.id} value={game.id}>
+                        {game.icon} {game.gameName} - {game.category}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 
                 <div>

@@ -877,31 +877,49 @@ app.delete('/api/projects/:id', (req, res) => {
 
 // 服务器管理API
 app.get('/api/servers', (req, res) => {
+  // 返回关联游戏信息的服务器
+  const serversWithGames = servers.map(server => {
+    const game = games.find(g => g.id === server.gameId);
+    return {
+      ...server,
+      game: game || null
+    };
+  });
+  
   res.json({
     success: true,
-    data: servers,
-    total: servers.length
+    data: serversWithGames,
+    total: serversWithGames.length
   });
 });
 
 app.post('/api/servers', (req, res) => {
   const {
-    serverName, instanceId, game, region, instanceType, cpu, memory,
+    gameId, serverName, instanceId, region, instanceType, cpu, memory,
     disk, bandwidth, monthlyCost, status, startDate, endDate, description
   } = req.body;
   
-  if (!serverName || !instanceId || !monthlyCost) {
+  if (!gameId || !serverName || !instanceId || !monthlyCost) {
     return res.status(400).json({
       success: false,
       message: '缺少必填字段'
     });
   }
   
+  // 检查游戏是否存在
+  const game = games.find(g => g.id === parseInt(gameId));
+  if (!game) {
+    return res.status(400).json({
+      success: false,
+      message: '选择的游戏不存在'
+    });
+  }
+  
   const newServer = {
     id: servers.length + 1,
+    gameId: parseInt(gameId),
     serverName,
     instanceId,
-    game: game || '',
     region: region || '',
     instanceType: instanceType || '',
     cpu: cpu || '',
