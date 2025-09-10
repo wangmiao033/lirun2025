@@ -3,6 +3,8 @@ const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
 const xlsx = require('xlsx');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -269,56 +271,71 @@ let prepayments = [
   }
 ];
 
-// 模拟数据库 - 账单数据
+// 模拟数据库 - 对账数据（按游戏生成月度对账单）
 let bills = [
   {
     id: 1,
+    gameId: 1, // 关联王者荣耀
     billNumber: 'BILL-2024-001',
-    billType: '供应商账单',
-    recipient: '阿里云',
-    recipientType: '供应商',
-    project: '王者荣耀',
-    period: '2024年12月',
-    totalAmount: 50000,
+    billType: '研发商对账单',
+    recipient: '腾讯游戏工作室',
+    recipientType: '研发商',
+    billingPeriod: '2024-12',
+    rechargeAmount: 1000000, // 充值金额
+    testFee: 10000, // 测试费
+    voucher: 20000, // 代金券
+    settlementAmount: 970000, // 结算金额（充值-测试费-代金券）
+    channelFee: 50000, // 通道费
+    channelFeeRate: 0.05, // 通道费比例
+    settlementRate: 0.7, // 分成比例
+    finalAmount: 644000, // 最终结算金额
     status: '待发送',
-    items: [
-      { name: 'ECS服务器费用', amount: 30000, description: '王者荣耀游戏服务器' },
-      { name: 'RDS数据库费用', amount: 15000, description: '数据库服务' },
-      { name: 'CDN加速费用', amount: 5000, description: '内容分发网络' }
-    ],
-    createDate: '2024-12-10',
-    sendDate: '',
+    createDate: '2024-12-01',
     dueDate: '2024-12-31',
-    description: '12月份服务器相关费用'
+    description: '王者荣耀2024年12月对账单'
   },
   {
     id: 2,
+    gameId: 2, // 关联和平精英
     billNumber: 'BILL-2024-002',
-    billType: '研发商账单',
-    recipient: '腾讯游戏工作室',
+    billType: '研发商对账单',
+    recipient: '腾讯光子工作室群',
     recipientType: '研发商',
-    project: '和平精英',
-    period: '2024年12月',
-    totalAmount: 200000,
+    billingPeriod: '2024-12',
+    rechargeAmount: 800000,
+    testFee: 8000,
+    voucher: 15000,
+    settlementAmount: 777000,
+    channelFee: 40000,
+    channelFeeRate: 0.05,
+    settlementRate: 0.65,
+    finalAmount: 479050,
     status: '已发送',
-    items: [
-      { name: '游戏分成费用', amount: 150000, description: '游戏收入分成' },
-      { name: '技术支持费用', amount: 30000, description: '技术支持和维护' },
-      { name: '版权使用费用', amount: 20000, description: '游戏版权使用费' }
-    ],
-    createDate: '2024-12-08',
-    sendDate: '2024-12-09',
-    dueDate: '2024-12-25',
-    description: '12月份游戏分成和技术费用'
+    createDate: '2024-12-02',
+    dueDate: '2024-12-31',
+    description: '和平精英2024年12月对账单'
   },
   {
     id: 3,
+    gameId: 5, // 关联圣树唤歌
     billNumber: 'BILL-2024-003',
-    billType: '供应商账单',
-    recipient: '华为云',
-    recipientType: '供应商',
-    project: '测试环境',
-    period: '2024年12月',
+    billType: '研发商对账单',
+    recipient: '广州趣炫网络科技有限公司',
+    recipientType: '研发商',
+    billingPeriod: '2024-12',
+    rechargeAmount: 500000,
+    testFee: 5000,
+    voucher: 10000,
+    settlementAmount: 485000,
+    channelFee: 0, // 0%通道费
+    channelFeeRate: 0,
+    settlementRate: 0.2, // 研发20%
+    finalAmount: 97000,
+    status: '已确认',
+    createDate: '2024-12-03',
+    dueDate: '2024-12-31',
+    description: '圣树唤歌2024年12月对账单'
+  }
     totalAmount: 15000,
     status: '已确认',
     items: [
@@ -366,6 +383,143 @@ let suppliers = [
     description: '小米应用商店渠道'
   }
 ];
+
+// 模拟数据库 - 用户数据
+let users = [
+  {
+    id: 1,
+    username: 'admin',
+    email: 'admin@company.com',
+    password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+    role: 'admin',
+    department: '技术部',
+    isActive: true,
+    lastLogin: '2024-12-10',
+    profile: {
+      firstName: '管理员',
+      lastName: '系统',
+      phone: '13800138000',
+      avatar: ''
+    },
+    permissions: [
+      { module: 'projects', actions: ['read', 'write', 'delete', 'export'] },
+      { module: 'servers', actions: ['read', 'write', 'delete', 'export'] },
+      { module: 'bank', actions: ['read', 'write', 'delete', 'export'] },
+      { module: 'prepayments', actions: ['read', 'write', 'delete', 'export'] },
+      { module: 'advertising', actions: ['read', 'write', 'delete', 'export'] },
+      { module: 'users', actions: ['read', 'write', 'delete'] }
+    ]
+  },
+  {
+    id: 2,
+    username: 'manager',
+    email: 'manager@company.com',
+    password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+    role: 'manager',
+    department: '财务部',
+    isActive: true,
+    lastLogin: '2024-12-09',
+    profile: {
+      firstName: '财务',
+      lastName: '经理',
+      phone: '13800138001',
+      avatar: ''
+    },
+    permissions: [
+      { module: 'projects', actions: ['read', 'write', 'export'] },
+      { module: 'servers', actions: ['read', 'write'] },
+      { module: 'bank', actions: ['read', 'write', 'export'] },
+      { module: 'prepayments', actions: ['read', 'write', 'export'] },
+      { module: 'advertising', actions: ['read', 'write', 'export'] }
+    ]
+  },
+  {
+    id: 3,
+    username: 'user',
+    email: 'user@company.com',
+    password: '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
+    role: 'user',
+    department: '运营部',
+    isActive: true,
+    lastLogin: '2024-12-08',
+    profile: {
+      firstName: '普通',
+      lastName: '用户',
+      phone: '13800138002',
+      avatar: ''
+    },
+    permissions: [
+      { module: 'projects', actions: ['read', 'write'] },
+      { module: 'servers', actions: ['read'] },
+      { module: 'bank', actions: ['read'] },
+      { module: 'prepayments', actions: ['read'] },
+      { module: 'advertising', actions: ['read'] }
+    ]
+  }
+];
+
+// 认证中间件
+const auth = (req, res, next) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({
+        success: false,
+        message: '访问被拒绝，请提供有效的token'
+      });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const user = users.find(u => u.id === decoded.userId);
+    
+    if (!user || !user.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: 'Token无效或用户已被禁用'
+      });
+    }
+
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: 'Token无效'
+    });
+  }
+};
+
+// 权限检查中间件
+const authorize = (module, action) => {
+  return (req, res, next) => {
+    try {
+      const user = users.find(u => u.id === req.user.userId);
+      
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: '用户不存在'
+        });
+      }
+
+      if (user.role === 'admin' || user.permissions.some(p => p.module === module && p.actions.includes(action))) {
+        next();
+      } else {
+        res.status(403).json({
+          success: false,
+          message: '权限不足'
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: '权限检查失败',
+        error: error.message
+      });
+    }
+  };
+};
 
 // 模拟数据库 - 游戏产品主数据
 let games = [
@@ -592,6 +746,144 @@ let advertisingFees = [
     description: '圣树唤歌奇幻RPG游戏推广'
   }
 ];
+
+// 认证相关API
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // 查找用户
+    const user = users.find(u => u.email === email);
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: '邮箱或密码错误'
+      });
+    }
+
+    // 检查用户是否激活
+    if (!user.isActive) {
+      return res.status(401).json({
+        success: false,
+        message: '账户已被禁用'
+      });
+    }
+
+    // 验证密码
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        success: false,
+        message: '邮箱或密码错误'
+      });
+    }
+
+    // 更新最后登录时间
+    user.lastLogin = new Date().toISOString().split('T')[0];
+
+    // 生成JWT token
+    const token = jwt.sign(
+      { userId: user.id, role: user.role },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      success: true,
+      message: '登录成功',
+      data: {
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          department: user.department,
+          isActive: user.isActive,
+          lastLogin: user.lastLogin,
+          profile: user.profile,
+          permissions: user.permissions
+        },
+        token
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '登录失败',
+      error: error.message
+    });
+  }
+});
+
+// 获取当前用户信息
+app.get('/api/auth/me', auth, (req, res) => {
+  try {
+    const user = users.find(u => u.id === req.user.userId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: '用户不存在'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        department: user.department,
+        isActive: user.isActive,
+        lastLogin: user.lastLogin,
+        profile: user.profile,
+        permissions: user.permissions
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '获取用户信息失败',
+      error: error.message
+    });
+  }
+});
+
+// 获取所有用户（管理员）
+app.get('/api/users', auth, (req, res) => {
+  try {
+    const user = users.find(u => u.id === req.user.userId);
+    if (user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: '权限不足'
+      });
+    }
+
+    const userList = users.map(u => ({
+      id: u.id,
+      username: u.username,
+      email: u.email,
+      role: u.role,
+      department: u.department,
+      isActive: u.isActive,
+      lastLogin: u.lastLogin,
+      profile: u.profile,
+      permissions: u.permissions
+    }));
+
+    res.json({
+      success: true,
+      data: userList
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '获取用户列表失败',
+      error: error.message
+    });
+  }
+});
 
 // 游戏产品管理API
 app.get('/api/games', (req, res) => {

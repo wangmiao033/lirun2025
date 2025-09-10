@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import Header from './Header';
 
 const Layout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
@@ -80,6 +81,16 @@ const Layout = ({ children }) => {
       key: '/reports',
       icon: '📈',
       label: '报表分析',
+    },
+    {
+      key: '/analytics',
+      icon: '🔬',
+      label: '高级分析',
+    },
+    {
+      key: '/backup',
+      icon: '💾',
+      label: '数据备份',
     },
   ];
 
@@ -303,111 +314,7 @@ const Layout = ({ children }) => {
         minHeight: '100vh'
       }}>
         {/* 顶部导航栏 */}
-        <div style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%)',
-          backdropFilter: 'blur(20px)',
-          padding: '0 40px',
-          height: '90px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          position: 'sticky',
-          top: 0,
-          zIndex: 999,
-          borderBottom: '1px solid rgba(255, 255, 255, 0.2)'
-        }}>
-          <div>
-            <h1 style={{ 
-              margin: 0, 
-              color: '#2c3e50', 
-              fontSize: '28px',
-              fontWeight: '700',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-            }}>
-              {(() => {
-                // 查找当前路径对应的菜单项
-                for (const item of menuItems) {
-                  if (item.key === location.pathname) {
-                    return item.label;
-                  }
-                  if (item.children) {
-                    const child = item.children.find(child => child.key === location.pathname);
-                    if (child) {
-                      return child.label;
-                    }
-                  }
-                }
-                return '仪表盘';
-              })()}
-            </h1>
-            <p style={{ 
-              margin: '4px 0 0 0', 
-              color: '#7f8c8d', 
-              fontSize: '14px',
-              fontWeight: '400'
-            }}>
-              {new Date().toLocaleDateString('zh-CN', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                weekday: 'long'
-              })}
-            </p>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '12px',
-              padding: '8px 16px',
-              background: 'rgba(255, 255, 255, 0.6)',
-              borderRadius: '20px',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              backdropFilter: 'blur(10px)'
-            }}>
-              <div style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                backgroundColor: '#27ae60',
-                animation: 'pulse 2s infinite'
-              }}></div>
-              <span style={{ color: '#2c3e50', fontSize: '14px', fontWeight: '500' }}>
-                系统运行正常
-              </span>
-            </div>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-              fontSize: '18px',
-              fontWeight: 'bold',
-              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.transform = 'scale(1.1)';
-              e.target.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.6)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.transform = 'scale(1)';
-              e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
-            }}
-            >
-              管
-            </div>
-          </div>
-        </div>
+        <Header />
 
         {/* 页面内容 */}
         <div style={{ 
