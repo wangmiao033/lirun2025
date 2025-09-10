@@ -1626,17 +1626,18 @@ app.get('/api/server-statistics', (req, res) => {
   // 按游戏统计
   const gameStats = {};
   servers.forEach(server => {
-    if (!gameStats[server.game]) {
-      gameStats[server.game] = {
+    const gameName = server.game?.gameName || '未知游戏';
+    if (!gameStats[gameName]) {
+      gameStats[gameName] = {
         count: 0,
         monthlyCost: 0,
         running: 0
       };
     }
-    gameStats[server.game].count += 1;
-    gameStats[server.game].monthlyCost += server.monthlyCost;
+    gameStats[gameName].count += 1;
+    gameStats[gameName].monthlyCost += server.monthlyCost;
     if (server.status === '运行中') {
-      gameStats[server.game].running += 1;
+      gameStats[gameName].running += 1;
     }
   });
   
@@ -1906,6 +1907,22 @@ app.get('/api/advertising-statistics', (req, res) => {
     platformStats[ad.platform].spent += ad.spent;
   });
   
+  // 按游戏统计
+  const gameStats = {};
+  advertisingFees.forEach(ad => {
+    const gameName = ad.game?.gameName || '未知游戏';
+    if (!gameStats[gameName]) {
+      gameStats[gameName] = {
+        count: 0,
+        budget: 0,
+        spent: 0
+      };
+    }
+    gameStats[gameName].count += 1;
+    gameStats[gameName].budget += ad.budget;
+    gameStats[gameName].spent += ad.spent;
+  });
+  
   // 按状态统计
   const statusStats = {
     '未开始': advertisingFees.filter(a => a.status === '未开始').length,
@@ -1929,6 +1946,7 @@ app.get('/api/advertising-statistics', (req, res) => {
       totalSpent,
       totalRemaining,
       platformStats,
+      gameStats,
       statusStats,
       totalImpressions,
       totalClicks,
@@ -2088,21 +2106,22 @@ app.get('/api/statistics', (req, res) => {
   const totalProfit = totalRevenue - totalCost;
   const profitRate = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100).toFixed(1) : 0;
   
-  // 按项目统计
+  // 按游戏统计
   const projectStats = {};
   projects.forEach(project => {
-    if (!projectStats[project.projectName]) {
-      projectStats[project.projectName] = {
+    const gameName = project.game?.gameName || '未知游戏';
+    if (!projectStats[gameName]) {
+      projectStats[gameName] = {
         revenue: 0,
         cost: 0,
         profit: 0,
         count: 0
       };
     }
-    projectStats[project.projectName].revenue += project.companyRevenue;
-    projectStats[project.projectName].cost += project.costTotal;
-    projectStats[project.projectName].profit += project.grossProfit;
-    projectStats[project.projectName].count += 1;
+    projectStats[gameName].revenue += project.companyRevenue;
+    projectStats[gameName].cost += project.costTotal;
+    projectStats[gameName].profit += project.grossProfit;
+    projectStats[gameName].count += 1;
   });
   
   // 计算项目利润率
