@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 
 const SupplierManagement = () => {
   const [suppliers, setSuppliers] = useState([]);
+  const [servers, setServers] = useState([]);
+  const [advertisingFees, setAdvertisingFees] = useState([]);
   const [researchProjects, setResearchProjects] = useState([]);
   const [channels, setChannels] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,6 +21,8 @@ const SupplierManagement = () => {
   
   // 折叠状态管理
   const [collapsedSections, setCollapsedSections] = useState({
+    servers: false,
+    advertising: false,
     research: false,
     channels: false
   });
@@ -29,6 +33,8 @@ const SupplierManagement = () => {
 
   useEffect(() => {
     fetchSuppliers();
+    fetchServers();
+    fetchAdvertisingFees();
     fetchResearchProjects();
     fetchChannels();
   }, []);
@@ -44,6 +50,30 @@ const SupplierManagement = () => {
       console.error('获取供应商数据失败:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchServers = async () => {
+    try {
+      const response = await fetch('/api/servers');
+      const result = await response.json();
+      if (result.success) {
+        setServers(result.data);
+      }
+    } catch (error) {
+      console.error('获取服务器数据失败:', error);
+    }
+  };
+
+  const fetchAdvertisingFees = async () => {
+    try {
+      const response = await fetch('/api/advertising-fees');
+      const result = await response.json();
+      if (result.success) {
+        setAdvertisingFees(result.data);
+      }
+    } catch (error) {
+      console.error('获取广告费数据失败:', error);
     }
   };
 
@@ -186,7 +216,12 @@ const SupplierManagement = () => {
         alignItems: 'center',
         marginBottom: '30px'
       }}>
-        <h1 style={{ margin: 0, color: '#333' }}>🏢 供应商管理</h1>
+        <div>
+          <h1 style={{ margin: '0 0 10px 0', color: '#333' }}>🏢 供应商管理</h1>
+          <p style={{ margin: 0, color: '#666', fontSize: '14px' }}>
+            统一管理供应商、服务器、广告费、研发项目和渠道信息
+          </p>
+        </div>
         <button
           onClick={() => setShowModal(true)}
           style={{
@@ -282,7 +317,7 @@ const SupplierManagement = () => {
         </div>
       </div>
 
-      {/* 供应商列表 */}
+      {/* 服务器管理模块（可折叠） */}
       <div style={{
         backgroundColor: '#fff',
         borderRadius: '12px',
@@ -290,103 +325,128 @@ const SupplierManagement = () => {
         overflow: 'hidden',
         marginBottom: '30px'
       }}>
-        <div style={{ 
-          padding: '20px', 
-          borderBottom: '1px solid #f0f0f0',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <h2 style={{ margin: 0, color: '#333' }}>🏢 供应商列表</h2>
+        <div 
+          style={{ 
+            padding: '20px', 
+            borderBottom: '1px solid #f0f0f0',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: '#f8f9fa'
+          }}
+          onClick={() => toggleSection('servers')}
+        >
+          <h2 style={{ margin: 0, color: '#333', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            🖥️ 服务器管理
+            <span style={{ fontSize: '14px', color: '#666', fontWeight: 'normal' }}>
+              ({servers.length} 台服务器)
+            </span>
+          </h2>
           <div style={{ 
-            fontSize: '14px', 
+            fontSize: '20px', 
             color: '#666',
-            backgroundColor: '#f8f9fa',
-            padding: '8px 16px',
-            borderRadius: '20px',
-            border: '1px solid #e9ecef'
+            transform: collapsedSections.servers ? 'rotate(0deg)' : 'rotate(180deg)',
+            transition: 'transform 0.3s ease'
           }}>
-            显示 {filteredSuppliers.length} / {suppliers.length} 条记录
+            ▼
           </div>
         </div>
         
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{
-            width: '100%',
-            borderCollapse: 'collapse',
-            minWidth: '800px'
-          }}>
-            <thead>
-              <tr style={{ backgroundColor: '#f8f9fa' }}>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>供应商名称</th>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>类型</th>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>联系人</th>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>电话</th>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>邮箱</th>
-                <th style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredSuppliers.map((supplier) => (
-                <tr key={supplier.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                  <td style={{ padding: '16px' }}>
-                    <div>
-                      <div style={{ fontWeight: 'bold' }}>{supplier.name}</div>
-                      <div style={{ fontSize: '12px', color: '#666' }}>{supplier.address}</div>
-                    </div>
-                  </td>
-                  <td style={{ padding: '16px' }}>
-                    <span style={{
-                      padding: '4px 8px',
-                      borderRadius: '4px',
-                      fontSize: '12px',
-                      backgroundColor: '#e6f7ff',
-                      color: '#1890ff',
-                      border: '1px solid #91d5ff'
-                    }}>
-                      {supplier.type}
-                    </span>
-                  </td>
-                  <td style={{ padding: '16px' }}>{supplier.contact}</td>
-                  <td style={{ padding: '16px' }}>{supplier.phone}</td>
-                  <td style={{ padding: '16px' }}>{supplier.email}</td>
-                  <td style={{ padding: '16px', textAlign: 'center' }}>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                      <button
-                        onClick={() => handleEdit(supplier)}
-                        style={{
-                          backgroundColor: '#1890ff',
-                          color: 'white',
-                          border: 'none',
-                          padding: '6px 12px',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '12px'
-                        }}
-                      >
-                        编辑
-                      </button>
-                      <button
-                        onClick={() => handleDelete(supplier.id)}
-                        style={{
-                          backgroundColor: '#ff4d4f',
-                          color: 'white',
-                          border: 'none',
-                          padding: '6px 12px',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontSize: '12px'
-                        }}
-                      >
-                        删除
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+        {!collapsedSections.servers && (
+          <div style={{ padding: '20px' }}>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+              gap: '20px' 
+            }}>
+              {servers.map((server) => (
+                <div key={server.id} style={{
+                  padding: '20px',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '8px',
+                  border: '1px solid #e9ecef'
+                }}>
+                  <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>{server.name}</h3>
+                  <div style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
+                    <div>IP: {server.ip}</div>
+                    <div>状态: {server.status}</div>
+                    <div>配置: {server.config}</div>
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#999' }}>
+                    {server.description}
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 广告费管理模块（可折叠） */}
+      <div style={{
+        backgroundColor: '#fff',
+        borderRadius: '12px',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+        overflow: 'hidden',
+        marginBottom: '30px'
+      }}>
+        <div 
+          style={{ 
+            padding: '20px', 
+            borderBottom: '1px solid #f0f0f0',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            cursor: 'pointer',
+            backgroundColor: '#f8f9fa'
+          }}
+          onClick={() => toggleSection('advertising')}
+        >
+          <h2 style={{ margin: 0, color: '#333', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            📢 广告费管理
+            <span style={{ fontSize: '14px', color: '#666', fontWeight: 'normal' }}>
+              ({advertisingFees.length} 个广告)
+            </span>
+          </h2>
+          <div style={{ 
+            fontSize: '20px', 
+            color: '#666',
+            transform: collapsedSections.advertising ? 'rotate(0deg)' : 'rotate(180deg)',
+            transition: 'transform 0.3s ease'
+          }}>
+            ▼
+          </div>
         </div>
+        
+        {!collapsedSections.advertising && (
+          <div style={{ padding: '20px' }}>
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+              gap: '20px' 
+            }}>
+              {advertisingFees.map((ad) => (
+                <div key={ad.id} style={{
+                  padding: '20px',
+                  backgroundColor: '#f8f9fa',
+                  borderRadius: '8px',
+                  border: '1px solid #e9ecef'
+                }}>
+                  <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>{ad.campaignName}</h3>
+                  <div style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
+                    <div>平台: {ad.platform}</div>
+                    <div>费用: ¥{ad.amount?.toLocaleString()}</div>
+                    <div>状态: {ad.status}</div>
+                  </div>
+                  <div style={{ fontSize: '12px', color: '#999' }}>
+                    {ad.description}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 研发管理模块（可折叠） */}
