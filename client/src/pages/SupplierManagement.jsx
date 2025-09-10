@@ -427,29 +427,148 @@ const SupplierManagement = () => {
         
         {!collapsedSections.research && (
           <div style={{ padding: '20px' }}>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-              gap: '20px' 
+            {/* 研发项目操作栏 */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px'
             }}>
-              {researchProjects.map((project) => (
-                <div key={project.id} style={{
-                  padding: '20px',
-                  backgroundColor: '#f8f9fa',
-                  borderRadius: '8px',
-                  border: '1px solid #e9ecef'
-                }}>
-                  <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>{project.name}</h3>
-                  <div style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
-                    <div>负责人: {project.manager}</div>
-                    <div>预算: ¥{project.budget?.toLocaleString()}</div>
-                    <div>状态: {project.status}</div>
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#999' }}>
-                    {project.description}
-                  </div>
-                </div>
-              ))}
+              <h3 style={{ margin: 0, color: '#333' }}>研发项目列表</h3>
+              <button
+                onClick={() => {
+                  // 这里可以添加新增研发项目的逻辑
+                  alert('新增研发项目功能');
+                }}
+                style={{
+                  backgroundColor: '#52c41a',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '12px'
+                }}
+              >
+                ➕ 新增项目
+              </button>
+            </div>
+            
+            {/* 研发项目表格 */}
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                minWidth: '800px'
+              }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#f8f9fa' }}>
+                    <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>项目编号</th>
+                    <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>项目名称</th>
+                    <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>负责人</th>
+                    <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>类型</th>
+                    <th style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>预算</th>
+                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>状态</th>
+                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {researchProjects.map((project) => (
+                    <tr key={project.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                      <td style={{ padding: '12px' }}>
+                        <div style={{ fontWeight: 'bold', color: '#1890ff' }}>{project.projectCode}</div>
+                      </td>
+                      <td style={{ padding: '12px' }}>
+                        <div>
+                          <div style={{ fontWeight: 'bold' }}>{project.projectName}</div>
+                          <div style={{ fontSize: '12px', color: '#666' }}>
+                            {project.startDate} - {project.endDate}
+                          </div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '12px' }}>{project.manager}</td>
+                      <td style={{ padding: '12px' }}>
+                        <span style={{
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          fontSize: '12px',
+                          backgroundColor: '#e6f7ff',
+                          color: '#1890ff',
+                          border: '1px solid #91d5ff'
+                        }}>
+                          {project.projectType === 'development' ? '开发研究' : 
+                           project.projectType === 'applied' ? '应用研究' : 
+                           project.projectType === 'basic' ? '基础研究' : 
+                           project.projectType === 'innovation' ? '创新研究' : project.projectType}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', color: '#52c41a' }}>
+                        ¥{project.budget?.toLocaleString()}
+                      </td>
+                      <td style={{ padding: '12px', textAlign: 'center' }}>
+                        <span style={{
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          fontSize: '12px',
+                          backgroundColor: '#f0f0f0',
+                          color: project.status === 'active' ? '#52c41a' : 
+                                project.status === 'planning' ? '#1890ff' : 
+                                project.status === 'completed' ? '#52c41a' : '#faad14',
+                          border: `1px solid ${project.status === 'active' ? '#52c41a' : 
+                                          project.status === 'planning' ? '#1890ff' : 
+                                          project.status === 'completed' ? '#52c41a' : '#faad14'}`
+                        }}>
+                          {project.status === 'active' ? '进行中' : 
+                           project.status === 'planning' ? '规划中' : 
+                           project.status === 'completed' ? '已完成' : 
+                           project.status === 'suspended' ? '暂停' : 
+                           project.status === 'cancelled' ? '已取消' : project.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                          <button
+                            onClick={() => {
+                              // 这里可以添加编辑研发项目的逻辑
+                              alert('编辑研发项目功能');
+                            }}
+                            style={{
+                              backgroundColor: '#1890ff',
+                              color: 'white',
+                              border: 'none',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              fontSize: '12px'
+                            }}
+                          >
+                            编辑
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm('确定要删除这个研发项目吗？')) {
+                                // 这里可以添加删除研发项目的逻辑
+                                alert('删除研发项目功能');
+                              }
+                            }}
+                            style={{
+                              backgroundColor: '#ff4d4f',
+                              color: 'white',
+                              border: 'none',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              fontSize: '12px'
+                            }}
+                          >
+                            删除
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -493,29 +612,144 @@ const SupplierManagement = () => {
         
         {!collapsedSections.channels && (
           <div style={{ padding: '20px' }}>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
-              gap: '20px' 
+            {/* 渠道操作栏 */}
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '20px'
             }}>
-              {channels.map((channel) => (
-                <div key={channel.id} style={{
-                  padding: '20px',
-                  backgroundColor: '#f8f9fa',
-                  borderRadius: '8px',
-                  border: '1px solid #e9ecef'
-                }}>
-                  <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>{channel.name}</h3>
-                  <div style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
-                    <div>类型: {channel.type}</div>
-                    <div>负责人: {channel.manager}</div>
-                    <div>状态: {channel.status}</div>
-                  </div>
-                  <div style={{ fontSize: '12px', color: '#999' }}>
-                    {channel.description}
-                  </div>
-                </div>
-              ))}
+              <h3 style={{ margin: 0, color: '#333' }}>渠道列表</h3>
+              <button
+                onClick={() => {
+                  // 这里可以添加新增渠道的逻辑
+                  alert('新增渠道功能');
+                }}
+                style={{
+                  backgroundColor: '#52c41a',
+                  color: 'white',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '12px'
+                }}
+              >
+                ➕ 新增渠道
+              </button>
+            </div>
+            
+            {/* 渠道表格 */}
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                minWidth: '900px'
+              }}>
+                <thead>
+                  <tr style={{ backgroundColor: '#f8f9fa' }}>
+                    <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>渠道名称</th>
+                    <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>类型</th>
+                    <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>负责人</th>
+                    <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>联系人</th>
+                    <th style={{ padding: '12px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>电话</th>
+                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>状态</th>
+                    <th style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {channels.map((channel) => (
+                    <tr key={channel.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
+                      <td style={{ padding: '12px' }}>
+                        <div>
+                          <div style={{ fontWeight: 'bold' }}>{channel.name}</div>
+                          <div style={{ fontSize: '12px', color: '#666' }}>{channel.email}</div>
+                        </div>
+                      </td>
+                      <td style={{ padding: '12px' }}>
+                        <span style={{
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          fontSize: '12px',
+                          backgroundColor: '#e6f7ff',
+                          color: '#1890ff',
+                          border: '1px solid #91d5ff'
+                        }}>
+                          {channel.type === 'app_store' ? '应用商店' :
+                           channel.type === 'google_play' ? 'Google Play' :
+                           channel.type === 'huawei' ? '华为应用市场' :
+                           channel.type === 'xiaomi' ? '小米应用商店' :
+                           channel.type === 'oppo' ? 'OPPO软件商店' :
+                           channel.type === 'vivo' ? 'vivo应用商店' :
+                           channel.type === 'other' ? '其他' : channel.type}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px' }}>{channel.manager}</td>
+                      <td style={{ padding: '12px' }}>{channel.contact}</td>
+                      <td style={{ padding: '12px' }}>{channel.phone}</td>
+                      <td style={{ padding: '12px', textAlign: 'center' }}>
+                        <span style={{
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          fontSize: '12px',
+                          backgroundColor: '#f0f0f0',
+                          color: channel.status === 'active' ? '#52c41a' : 
+                                channel.status === 'inactive' ? '#faad14' : 
+                                channel.status === 'suspended' ? '#ff4d4f' : '#1890ff',
+                          border: `1px solid ${channel.status === 'active' ? '#52c41a' : 
+                                          channel.status === 'inactive' ? '#faad14' : 
+                                          channel.status === 'suspended' ? '#ff4d4f' : '#1890ff'}`
+                        }}>
+                          {channel.status === 'active' ? '活跃' : 
+                           channel.status === 'inactive' ? '非活跃' : 
+                           channel.status === 'suspended' ? '暂停' : 
+                           channel.status === 'testing' ? '测试中' : channel.status}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                          <button
+                            onClick={() => {
+                              // 这里可以添加编辑渠道的逻辑
+                              alert('编辑渠道功能');
+                            }}
+                            style={{
+                              backgroundColor: '#1890ff',
+                              color: 'white',
+                              border: 'none',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              fontSize: '12px'
+                            }}
+                          >
+                            编辑
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (confirm('确定要删除这个渠道吗？')) {
+                                // 这里可以添加删除渠道的逻辑
+                                alert('删除渠道功能');
+                              }
+                            }}
+                            style={{
+                              backgroundColor: '#ff4d4f',
+                              color: 'white',
+                              border: 'none',
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              fontSize: '12px'
+                            }}
+                          >
+                            删除
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
