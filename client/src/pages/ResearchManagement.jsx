@@ -2,15 +2,18 @@ import React, { useState, useEffect } from 'react';
 
 const ResearchManagement = () => {
   const [researchProjects, setResearchProjects] = useState([]);
+  const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [formData, setFormData] = useState({
-    projectName: '',
+    gameId: '',
     prepayment: '',
     status: '',
     revenueShare: '',
     channelFee: '',
+    startDate: '',
+    endDate: '',
     description: ''
   });
   
@@ -20,6 +23,7 @@ const ResearchManagement = () => {
 
   useEffect(() => {
     fetchResearchProjects();
+    fetchGames();
   }, []);
 
   const fetchResearchProjects = async () => {
@@ -33,6 +37,18 @@ const ResearchManagement = () => {
       console.error('获取研发项目数据失败:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchGames = async () => {
+    try {
+      const response = await fetch('/api/games');
+      const result = await response.json();
+      if (result.success) {
+        setGames(result.data);
+      }
+    } catch (error) {
+      console.error('获取游戏列表失败:', error);
     }
   };
 
@@ -68,11 +84,13 @@ const ResearchManagement = () => {
 
   const resetForm = () => {
     setFormData({
-      projectName: '',
+      gameId: '',
       prepayment: '',
       status: '',
       revenueShare: '',
       channelFee: '',
+      startDate: '',
+      endDate: '',
       description: ''
     });
   };
@@ -80,11 +98,13 @@ const ResearchManagement = () => {
   const handleEdit = (project) => {
     setEditingProject(project);
     setFormData({
-      projectName: project.projectName,
+      gameId: project.gameId?.toString() || '',
       prepayment: project.prepayment?.toString() || '',
       status: project.status,
       revenueShare: project.revenueShare?.toString() || '',
       channelFee: project.channelFee?.toString() || '',
+      startDate: project.startDate || '',
+      endDate: project.endDate || '',
       description: project.description
     });
     setShowModal(true);
@@ -135,7 +155,7 @@ const ResearchManagement = () => {
   // 筛选逻辑
   const filteredProjects = researchProjects.filter(project => {
     const matchesSearch = !searchTerm || 
-      project.projectName.toLowerCase().includes(searchTerm.toLowerCase());
+      (project.game && project.game.gameName.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesStatus = !filterStatus || project.status === filterStatus;
     
@@ -469,8 +489,13 @@ const ResearchManagement = () => {
                       alignItems: 'center',
                       gap: '8px'
                     }}>
-                      <span style={{ fontSize: '18px' }}>🎮</span>
-                      {project.projectName}
+                      <span style={{ fontSize: '18px' }}>{project.game?.icon || '🎮'}</span>
+                      <div>
+                        <div style={{ fontWeight: '600' }}>{project.game?.gameName || '未知游戏'}</div>
+                        <div style={{ fontSize: '12px', color: '#7f8c8d' }}>
+                          {project.game?.category} | {project.game?.platform}
+                        </div>
+                      </div>
                     </div>
                   </td>
                   <td style={{ padding: '16px 20px', textAlign: 'right' }}>
@@ -654,14 +679,12 @@ const ResearchManagement = () => {
                     color: '#2c3e50',
                     fontSize: '14px'
                   }}>
-                    游戏项目名称 *
+                    选择游戏 *
                   </label>
-                  <input
-                    type="text"
-                    value={formData.projectName}
-                    onChange={(e) => setFormData({...formData, projectName: e.target.value})}
+                  <select
+                    value={formData.gameId}
+                    onChange={(e) => setFormData({...formData, gameId: e.target.value})}
                     required
-                    placeholder="如：王者荣耀、和平精英"
                     style={{
                       width: '100%',
                       padding: '14px 16px',
@@ -671,7 +694,8 @@ const ResearchManagement = () => {
                       background: 'rgba(255, 255, 255, 0.8)',
                       backdropFilter: 'blur(10px)',
                       transition: 'all 0.3s ease',
-                      outline: 'none'
+                      outline: 'none',
+                      cursor: 'pointer'
                     }}
                     onFocus={(e) => {
                       e.target.style.borderColor = '#667eea';
@@ -681,7 +705,14 @@ const ResearchManagement = () => {
                       e.target.style.borderColor = 'rgba(102, 126, 234, 0.2)';
                       e.target.style.boxShadow = 'none';
                     }}
-                  />
+                  >
+                    <option value="">请选择游戏</option>
+                    {games.map(game => (
+                      <option key={game.id} value={game.id}>
+                        {game.icon} {game.gameName} - {game.category}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
               
@@ -765,6 +796,80 @@ const ResearchManagement = () => {
                     <option value="suspended">暂停</option>
                     <option value="cancelled">已取消</option>
                   </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+                <div>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '8px', 
+                    fontWeight: '600',
+                    color: '#2c3e50',
+                    fontSize: '14px'
+                  }}>
+                    开始日期
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.startDate}
+                    onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      border: '1px solid rgba(102, 126, 234, 0.2)',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      backdropFilter: 'blur(10px)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#667eea';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(102, 126, 234, 0.2)';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '8px', 
+                    fontWeight: '600',
+                    color: '#2c3e50',
+                    fontSize: '14px'
+                  }}>
+                    结束日期
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.endDate}
+                    onChange={(e) => setFormData({...formData, endDate: e.target.value})}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      border: '1px solid rgba(102, 126, 234, 0.2)',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      backdropFilter: 'blur(10px)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#667eea';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(102, 126, 234, 0.2)';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  />
                 </div>
               </div>
               

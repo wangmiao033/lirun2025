@@ -344,34 +344,100 @@ let suppliers = [
   }
 ];
 
-// 模拟数据库 - 游戏研发项目数据
+// 模拟数据库 - 游戏产品主数据
+let games = [
+  {
+    id: 1,
+    gameName: '王者荣耀',
+    gameCode: 'WZRY',
+    category: 'MOBA',
+    platform: 'Mobile',
+    developer: '腾讯游戏',
+    publisher: '腾讯游戏',
+    releaseDate: '2015-11-26',
+    status: 'active',
+    description: '5V5英雄公平对战手游，腾讯最受欢迎的游戏之一',
+    icon: '🎮',
+    tags: ['MOBA', '竞技', '团队合作']
+  },
+  {
+    id: 2,
+    gameName: '和平精英',
+    gameCode: 'HPJY',
+    category: 'Battle Royale',
+    platform: 'Mobile',
+    developer: '腾讯光子工作室群',
+    publisher: '腾讯游戏',
+    releaseDate: '2019-05-08',
+    status: 'active',
+    description: '腾讯光子工作室群自研反恐军事竞赛体验手游',
+    icon: '🔫',
+    tags: ['大逃杀', '射击', '竞技']
+  },
+  {
+    id: 3,
+    gameName: '原神',
+    gameCode: 'YS',
+    category: 'RPG',
+    platform: 'Multi-Platform',
+    developer: '米哈游',
+    publisher: '米哈游',
+    releaseDate: '2020-09-28',
+    status: 'active',
+    description: '米哈游开发的开放世界冒险RPG游戏',
+    icon: '⚔️',
+    tags: ['开放世界', 'RPG', '冒险']
+  },
+  {
+    id: 4,
+    gameName: '英雄联盟手游',
+    gameCode: 'LOLM',
+    category: 'MOBA',
+    platform: 'Mobile',
+    developer: 'Riot Games',
+    publisher: '腾讯游戏',
+    releaseDate: '2021-10-08',
+    status: 'active',
+    description: '英雄联盟正版手游，经典MOBA体验',
+    icon: '🏆',
+    tags: ['MOBA', '竞技', '策略']
+  }
+];
+
+// 模拟数据库 - 游戏研发项目数据（关联游戏产品）
 let researchProjects = [
   {
     id: 1,
-    projectName: '王者荣耀',
+    gameId: 1, // 关联王者荣耀
     prepayment: 1000000,
     status: 'active',
     revenueShare: 70,
     channelFee: 50000,
-    description: '5V5英雄公平对战手游，腾讯最受欢迎的游戏之一'
+    startDate: '2024-01-01',
+    endDate: '2024-12-31',
+    description: '王者荣耀研发项目'
   },
   {
     id: 2,
-    projectName: '和平精英',
+    gameId: 2, // 关联和平精英
     prepayment: 800000,
     status: 'active',
     revenueShare: 65,
     channelFee: 40000,
-    description: '腾讯光子工作室群自研反恐军事竞赛体验手游'
+    startDate: '2024-01-01',
+    endDate: '2024-12-31',
+    description: '和平精英研发项目'
   },
   {
     id: 3,
-    projectName: '原神',
+    gameId: 3, // 关联原神
     prepayment: 2000000,
     status: 'completed',
     revenueShare: 80,
     channelFee: 100000,
-    description: '米哈游开发的开放世界冒险RPG游戏'
+    startDate: '2023-01-01',
+    endDate: '2023-12-31',
+    description: '原神研发项目'
   }
 ];
 
@@ -478,6 +544,108 @@ let advertisingFees = [
     description: '新游戏上线前的预热推广'
   }
 ];
+
+// 游戏产品管理API
+app.get('/api/games', (req, res) => {
+  res.json({
+    success: true,
+    data: games,
+    total: games.length
+  });
+});
+
+app.get('/api/games/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const game = games.find(g => g.id === id);
+  
+  if (!game) {
+    return res.status(404).json({
+      success: false,
+      message: '游戏不存在'
+    });
+  }
+  
+  res.json({
+    success: true,
+    data: game
+  });
+});
+
+app.post('/api/games', (req, res) => {
+  const { gameName, gameCode, category, platform, developer, publisher, releaseDate, status, description, icon, tags } = req.body;
+  
+  if (!gameName || !gameCode || !category) {
+    return res.status(400).json({
+      success: false,
+      message: '缺少必填字段'
+    });
+  }
+  
+  const newGame = {
+    id: games.length + 1,
+    gameName,
+    gameCode,
+    category,
+    platform: platform || 'Mobile',
+    developer: developer || '',
+    publisher: publisher || '',
+    releaseDate: releaseDate || '',
+    status: status || 'active',
+    description: description || '',
+    icon: icon || '🎮',
+    tags: tags || []
+  };
+  
+  games.push(newGame);
+  
+  res.json({
+    success: true,
+    data: newGame,
+    message: '游戏产品创建成功'
+  });
+});
+
+app.put('/api/games/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const gameIndex = games.findIndex(g => g.id === id);
+  
+  if (gameIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '游戏不存在'
+    });
+  }
+  
+  games[gameIndex] = {
+    ...games[gameIndex],
+    ...req.body
+  };
+  
+  res.json({
+    success: true,
+    data: games[gameIndex],
+    message: '游戏产品更新成功'
+  });
+});
+
+app.delete('/api/games/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const gameIndex = games.findIndex(g => g.id === id);
+  
+  if (gameIndex === -1) {
+    return res.status(404).json({
+      success: false,
+      message: '游戏不存在'
+    });
+  }
+  
+  games.splice(gameIndex, 1);
+  
+  res.json({
+    success: true,
+    message: '游戏产品删除成功'
+  });
+});
 
 // 获取所有项目数据
 app.get('/api/projects', (req, res) => {
@@ -1048,39 +1216,74 @@ app.delete('/api/suppliers/:id', (req, res) => {
 
 // 研发项目管理API
 app.get('/api/research-projects', (req, res) => {
+  // 返回关联游戏信息的研发项目
+  const projectsWithGames = researchProjects.map(project => {
+    const game = games.find(g => g.id === project.gameId);
+    return {
+      ...project,
+      game: game || null
+    };
+  });
+  
   res.json({
     success: true,
-    data: researchProjects,
-    total: researchProjects.length
+    data: projectsWithGames,
+    total: projectsWithGames.length
   });
 });
 
 app.post('/api/research-projects', (req, res) => {
-  const { projectName, prepayment, status, revenueShare, channelFee, description } = req.body;
+  const { gameId, prepayment, status, revenueShare, channelFee, startDate, endDate, description } = req.body;
   
-  if (!projectName || !status) {
+  if (!gameId || !status) {
     return res.status(400).json({
       success: false,
       message: '缺少必填字段'
     });
   }
   
+  // 检查游戏是否存在
+  const game = games.find(g => g.id === parseInt(gameId));
+  if (!game) {
+    return res.status(400).json({
+      success: false,
+      message: '选择的游戏不存在'
+    });
+  }
+  
+  // 检查是否已经存在该游戏的研发项目
+  const existingProject = researchProjects.find(p => p.gameId === parseInt(gameId));
+  if (existingProject) {
+    return res.status(400).json({
+      success: false,
+      message: '该游戏已存在研发项目'
+    });
+  }
+  
   const newProject = {
     id: researchProjects.length + 1,
-    projectName,
+    gameId: parseInt(gameId),
     prepayment: prepayment ? parseFloat(prepayment) : 0,
     status,
     revenueShare: revenueShare ? parseFloat(revenueShare) : 0,
     channelFee: channelFee ? parseFloat(channelFee) : 0,
+    startDate: startDate || '',
+    endDate: endDate || '',
     description: description || ''
   };
   
   researchProjects.push(newProject);
   
+  // 返回包含游戏信息的数据
+  const projectWithGame = {
+    ...newProject,
+    game: game
+  };
+  
   res.json({
     success: true,
-    data: newProject,
-    message: '游戏项目创建成功'
+    data: projectWithGame,
+    message: '研发项目创建成功'
   });
 });
 
