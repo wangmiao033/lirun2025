@@ -160,38 +160,79 @@ const ResearchManagement = () => {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '30px'
+        marginBottom: '24px',
+        padding: '20px 24px',
+        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: '16px',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+        border: '1px solid rgba(255, 255, 255, 0.2)'
       }}>
-        <h1 style={{ margin: 0, color: '#333' }}>🎮 游戏研发管理</h1>
+        <div>
+          <h1 style={{ 
+            margin: '0 0 4px 0', 
+            color: '#2c3e50',
+            fontSize: '28px',
+            fontWeight: '700',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent'
+          }}>
+            🎮 游戏研发管理
+          </h1>
+          <p style={{ 
+            margin: 0, 
+            color: '#7f8c8d', 
+            fontSize: '14px',
+            fontWeight: '400'
+          }}>
+            管理游戏项目的预付款、分成比例和通道费
+          </p>
+        </div>
         <button
           onClick={() => setShowModal(true)}
           style={{
-            backgroundColor: '#1890ff',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             color: 'white',
             border: 'none',
             padding: '12px 24px',
-            borderRadius: '6px',
+            borderRadius: '12px',
             cursor: 'pointer',
             fontSize: '14px',
-            fontWeight: 'bold'
+            fontWeight: '600',
+            boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
+            transition: 'all 0.3s ease',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.6)';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
           }}
         >
-          ➕ 新增项目
+          ➕ 新增游戏项目
         </button>
       </div>
 
       {/* 搜索和筛选区域 */}
       <div style={{
-        backgroundColor: '#fff',
+        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
+        backdropFilter: 'blur(10px)',
         padding: '20px',
-        borderRadius: '12px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        marginBottom: '30px'
+        borderRadius: '16px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+        marginBottom: '24px',
+        border: '1px solid rgba(255, 255, 255, 0.2)'
       }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: '15px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: '16px',
           alignItems: 'end'
         }}>
           <div>
@@ -205,10 +246,22 @@ const ResearchManagement = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
                 width: '100%',
-                padding: '10px',
-                border: '1px solid #d9d9d9',
-                borderRadius: '6px',
-                fontSize: '14px'
+                padding: '12px 16px',
+                border: '1px solid rgba(102, 126, 234, 0.2)',
+                borderRadius: '12px',
+                fontSize: '14px',
+                background: 'rgba(255, 255, 255, 0.8)',
+                backdropFilter: 'blur(10px)',
+                transition: 'all 0.3s ease',
+                outline: 'none'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#667eea';
+                e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(102, 126, 234, 0.2)';
+                e.target.style.boxShadow = 'none';
               }}
             />
           </div>
@@ -222,10 +275,23 @@ const ResearchManagement = () => {
               onChange={(e) => setFilterStatus(e.target.value)}
               style={{
                 width: '100%',
-                padding: '10px',
-                border: '1px solid #d9d9d9',
-                borderRadius: '6px',
-                fontSize: '14px'
+                padding: '12px 16px',
+                border: '1px solid rgba(102, 126, 234, 0.2)',
+                borderRadius: '12px',
+                fontSize: '14px',
+                background: 'rgba(255, 255, 255, 0.8)',
+                backdropFilter: 'blur(10px)',
+                transition: 'all 0.3s ease',
+                outline: 'none',
+                cursor: 'pointer'
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = '#667eea';
+                e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = 'rgba(102, 126, 234, 0.2)';
+                e.target.style.boxShadow = 'none';
               }}
             >
               <option value="">全部状态</option>
@@ -243,14 +309,28 @@ const ResearchManagement = () => {
                 setFilterStatus('');
               }}
               style={{
-                backgroundColor: '#f5f5f5',
-                color: '#333',
-                border: '1px solid #d9d9d9',
-                padding: '10px 20px',
-                borderRadius: '6px',
+                background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                color: '#495057',
+                border: '1px solid rgba(102, 126, 234, 0.2)',
+                padding: '12px 20px',
+                borderRadius: '12px',
                 cursor: 'pointer',
                 fontSize: '14px',
-                width: '100%'
+                fontWeight: '500',
+                width: '100%',
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = 'none';
               }}
             >
               🔄 重置筛选
@@ -261,26 +341,40 @@ const ResearchManagement = () => {
 
       {/* 项目列表 */}
       <div style={{
-        backgroundColor: '#fff',
-        borderRadius: '12px',
-        boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
+        background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: '16px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+        overflow: 'hidden',
+        border: '1px solid rgba(255, 255, 255, 0.2)'
       }}>
         <div style={{ 
-          padding: '20px', 
-          borderBottom: '1px solid #f0f0f0',
+          padding: '20px 24px', 
+          borderBottom: '1px solid rgba(102, 126, 234, 0.1)',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%)'
         }}>
-          <h2 style={{ margin: 0, color: '#333' }}>🎮 游戏项目列表</h2>
+          <h2 style={{ 
+            margin: 0, 
+            color: '#2c3e50',
+            fontSize: '20px',
+            fontWeight: '600',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            🎮 游戏项目列表
+          </h2>
           <div style={{ 
-            fontSize: '14px', 
-            color: '#666',
-            backgroundColor: '#f8f9fa',
-            padding: '8px 16px',
+            fontSize: '13px', 
+            color: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            padding: '6px 12px',
             borderRadius: '20px',
-            border: '1px solid #e9ecef'
+            border: '1px solid rgba(102, 126, 234, 0.2)',
+            fontWeight: '500'
           }}>
             显示 {filteredProjects.length} / {researchProjects.length} 条记录
           </div>
@@ -290,57 +384,171 @@ const ResearchManagement = () => {
           <table style={{
             width: '100%',
             borderCollapse: 'collapse',
-            minWidth: '1000px'
+            minWidth: '900px'
           }}>
             <thead>
-              <tr style={{ backgroundColor: '#f8f9fa' }}>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>项目名称</th>
-                <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>预付款</th>
-                <th style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>状态</th>
-                <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>分成比例</th>
-                <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>通道费</th>
-                <th style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>操作</th>
+              <tr style={{ 
+                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)'
+              }}>
+                <th style={{ 
+                  padding: '16px 20px', 
+                  textAlign: 'left', 
+                  borderBottom: '1px solid rgba(102, 126, 234, 0.2)',
+                  color: '#2c3e50',
+                  fontWeight: '600',
+                  fontSize: '14px'
+                }}>项目名称</th>
+                <th style={{ 
+                  padding: '16px 20px', 
+                  textAlign: 'right', 
+                  borderBottom: '1px solid rgba(102, 126, 234, 0.2)',
+                  color: '#2c3e50',
+                  fontWeight: '600',
+                  fontSize: '14px'
+                }}>预付款</th>
+                <th style={{ 
+                  padding: '16px 20px', 
+                  textAlign: 'center', 
+                  borderBottom: '1px solid rgba(102, 126, 234, 0.2)',
+                  color: '#2c3e50',
+                  fontWeight: '600',
+                  fontSize: '14px'
+                }}>状态</th>
+                <th style={{ 
+                  padding: '16px 20px', 
+                  textAlign: 'right', 
+                  borderBottom: '1px solid rgba(102, 126, 234, 0.2)',
+                  color: '#2c3e50',
+                  fontWeight: '600',
+                  fontSize: '14px'
+                }}>分成比例</th>
+                <th style={{ 
+                  padding: '16px 20px', 
+                  textAlign: 'right', 
+                  borderBottom: '1px solid rgba(102, 126, 234, 0.2)',
+                  color: '#2c3e50',
+                  fontWeight: '600',
+                  fontSize: '14px'
+                }}>通道费</th>
+                <th style={{ 
+                  padding: '16px 20px', 
+                  textAlign: 'center', 
+                  borderBottom: '1px solid rgba(102, 126, 234, 0.2)',
+                  color: '#2c3e50',
+                  fontWeight: '600',
+                  fontSize: '14px'
+                }}>操作</th>
               </tr>
             </thead>
             <tbody>
-              {filteredProjects.map((project) => (
-                <tr key={project.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
-                  <td style={{ padding: '16px' }}>
-                    <div style={{ fontWeight: 'bold', color: '#1890ff' }}>{project.projectName}</div>
+              {filteredProjects.map((project, index) => (
+                <tr 
+                  key={project.id} 
+                  style={{ 
+                    borderBottom: '1px solid rgba(102, 126, 234, 0.1)',
+                    background: index % 2 === 0 ? 'rgba(255, 255, 255, 0.5)' : 'rgba(102, 126, 234, 0.02)',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = 'rgba(102, 126, 234, 0.08)';
+                    e.target.style.transform = 'translateY(-1px)';
+                    e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = index % 2 === 0 ? 'rgba(255, 255, 255, 0.5)' : 'rgba(102, 126, 234, 0.02)';
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = 'none';
+                  }}
+                >
+                  <td style={{ padding: '16px 20px' }}>
+                    <div style={{ 
+                      fontWeight: '600', 
+                      color: '#2c3e50',
+                      fontSize: '15px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span style={{ fontSize: '18px' }}>🎮</span>
+                      {project.projectName}
+                    </div>
                   </td>
-                  <td style={{ padding: '16px', textAlign: 'right', fontWeight: 'bold', color: '#52c41a' }}>
-                    ¥{project.prepayment?.toLocaleString() || '0'}
-                  </td>
-                  <td style={{ padding: '16px', textAlign: 'center' }}>
-                    <span style={{
+                  <td style={{ padding: '16px 20px', textAlign: 'right' }}>
+                    <div style={{ 
+                      fontWeight: '700', 
+                      color: '#27ae60',
+                      fontSize: '15px',
+                      background: 'rgba(39, 174, 96, 0.1)',
                       padding: '4px 8px',
-                      borderRadius: '4px',
+                      borderRadius: '8px',
+                      display: 'inline-block'
+                    }}>
+                      ¥{project.prepayment?.toLocaleString() || '0'}
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px 20px', textAlign: 'center' }}>
+                    <span style={{
+                      padding: '6px 12px',
+                      borderRadius: '20px',
                       fontSize: '12px',
-                      backgroundColor: '#f0f0f0',
+                      fontWeight: '500',
+                      backgroundColor: getStatusColor(project.status) + '20',
                       color: getStatusColor(project.status),
-                      border: `1px solid ${getStatusColor(project.status)}`
+                      border: `1px solid ${getStatusColor(project.status)}40`,
+                      display: 'inline-block'
                     }}>
                       {getStatusText(project.status)}
                     </span>
                   </td>
-                  <td style={{ padding: '16px', textAlign: 'right', fontWeight: 'bold', color: '#1890ff' }}>
-                    {project.revenueShare || '0'}%
+                  <td style={{ padding: '16px 20px', textAlign: 'right' }}>
+                    <div style={{ 
+                      fontWeight: '700', 
+                      color: '#667eea',
+                      fontSize: '15px',
+                      background: 'rgba(102, 126, 234, 0.1)',
+                      padding: '4px 8px',
+                      borderRadius: '8px',
+                      display: 'inline-block'
+                    }}>
+                      {project.revenueShare || '0'}%
+                    </div>
                   </td>
-                  <td style={{ padding: '16px', textAlign: 'right', fontWeight: 'bold', color: '#fa8c16' }}>
-                    ¥{project.channelFee?.toLocaleString() || '0'}
+                  <td style={{ padding: '16px 20px', textAlign: 'right' }}>
+                    <div style={{ 
+                      fontWeight: '700', 
+                      color: '#e67e22',
+                      fontSize: '15px',
+                      background: 'rgba(230, 126, 34, 0.1)',
+                      padding: '4px 8px',
+                      borderRadius: '8px',
+                      display: 'inline-block'
+                    }}>
+                      ¥{project.channelFee?.toLocaleString() || '0'}
+                    </div>
                   </td>
-                  <td style={{ padding: '16px', textAlign: 'center' }}>
+                  <td style={{ padding: '16px 20px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
                       <button
                         onClick={() => handleEdit(project)}
                         style={{
-                          backgroundColor: '#1890ff',
+                          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                           color: 'white',
                           border: 'none',
-                          padding: '6px 12px',
-                          borderRadius: '4px',
+                          padding: '8px 16px',
+                          borderRadius: '8px',
                           cursor: 'pointer',
-                          fontSize: '12px'
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.transform = 'translateY(-2px)';
+                          e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.transform = 'translateY(0)';
+                          e.target.style.boxShadow = '0 2px 8px rgba(102, 126, 234, 0.3)';
                         }}
                       >
                         编辑
@@ -348,13 +556,24 @@ const ResearchManagement = () => {
                       <button
                         onClick={() => handleDelete(project.id)}
                         style={{
-                          backgroundColor: '#ff4d4f',
+                          background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%)',
                           color: 'white',
                           border: 'none',
-                          padding: '6px 12px',
-                          borderRadius: '4px',
+                          padding: '8px 16px',
+                          borderRadius: '8px',
                           cursor: 'pointer',
-                          fontSize: '12px'
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 2px 8px rgba(255, 107, 107, 0.3)'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.target.style.transform = 'translateY(-2px)';
+                          e.target.style.boxShadow = '0 4px 12px rgba(255, 107, 107, 0.4)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.target.style.transform = 'translateY(0)';
+                          e.target.style.boxShadow = '0 2px 8px rgba(255, 107, 107, 0.3)';
                         }}
                       >
                         删除
@@ -376,29 +595,65 @@ const ResearchManagement = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
+          background: 'rgba(0, 0, 0, 0.6)',
+          backdropFilter: 'blur(8px)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          zIndex: 1000
+          zIndex: 1000,
+          animation: 'fadeIn 0.3s ease'
         }}>
           <div style={{
-            backgroundColor: 'white',
-            padding: '30px',
-            borderRadius: '12px',
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.9) 100%)',
+            backdropFilter: 'blur(20px)',
+            padding: '32px',
+            borderRadius: '20px',
             width: '700px',
             maxWidth: '90vw',
             maxHeight: '90vh',
-            overflow: 'auto'
+            overflow: 'auto',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            animation: 'slideUp 0.3s ease'
           }}>
-            <h2 style={{ margin: '0 0 20px 0', color: '#333' }}>
-              {editingProject ? '编辑游戏项目' : '新增游戏项目'}
-            </h2>
+            <div style={{ 
+              marginBottom: '24px',
+              paddingBottom: '16px',
+              borderBottom: '1px solid rgba(102, 126, 234, 0.1)'
+            }}>
+              <h2 style={{ 
+                margin: '0 0 8px 0', 
+                color: '#2c3e50',
+                fontSize: '24px',
+                fontWeight: '700',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                🎮 {editingProject ? '编辑游戏项目' : '新增游戏项目'}
+              </h2>
+              <p style={{ 
+                margin: 0, 
+                color: '#7f8c8d', 
+                fontSize: '14px' 
+              }}>
+                {editingProject ? '修改游戏项目信息' : '创建新的游戏项目'}
+              </p>
+            </div>
             
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: '20px' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '8px', 
+                    fontWeight: '600',
+                    color: '#2c3e50',
+                    fontSize: '14px'
+                  }}>
                     游戏项目名称 *
                   </label>
                   <input
@@ -409,10 +664,22 @@ const ResearchManagement = () => {
                     placeholder="如：王者荣耀、和平精英"
                     style={{
                       width: '100%',
-                      padding: '12px',
-                      border: '1px solid #d9d9d9',
-                      borderRadius: '6px',
-                      fontSize: '14px'
+                      padding: '14px 16px',
+                      border: '1px solid rgba(102, 126, 234, 0.2)',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      backdropFilter: 'blur(10px)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#667eea';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(102, 126, 234, 0.2)';
+                      e.target.style.boxShadow = 'none';
                     }}
                   />
                 </div>
@@ -420,7 +687,13 @@ const ResearchManagement = () => {
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '8px', 
+                    fontWeight: '600',
+                    color: '#2c3e50',
+                    fontSize: '14px'
+                  }}>
                     预付款
                   </label>
                   <input
@@ -430,16 +703,34 @@ const ResearchManagement = () => {
                     placeholder="0"
                     style={{
                       width: '100%',
-                      padding: '12px',
-                      border: '1px solid #d9d9d9',
-                      borderRadius: '6px',
-                      fontSize: '14px'
+                      padding: '14px 16px',
+                      border: '1px solid rgba(102, 126, 234, 0.2)',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      backdropFilter: 'blur(10px)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#667eea';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(102, 126, 234, 0.2)';
+                      e.target.style.boxShadow = 'none';
                     }}
                   />
                 </div>
                 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '8px', 
+                    fontWeight: '600',
+                    color: '#2c3e50',
+                    fontSize: '14px'
+                  }}>
                     状态 *
                   </label>
                   <select
@@ -448,10 +739,23 @@ const ResearchManagement = () => {
                     required
                     style={{
                       width: '100%',
-                      padding: '12px',
-                      border: '1px solid #d9d9d9',
-                      borderRadius: '6px',
-                      fontSize: '14px'
+                      padding: '14px 16px',
+                      border: '1px solid rgba(102, 126, 234, 0.2)',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      backdropFilter: 'blur(10px)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#667eea';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(102, 126, 234, 0.2)';
+                      e.target.style.boxShadow = 'none';
                     }}
                   >
                     <option value="">请选择状态</option>
@@ -466,7 +770,13 @@ const ResearchManagement = () => {
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '8px', 
+                    fontWeight: '600',
+                    color: '#2c3e50',
+                    fontSize: '14px'
+                  }}>
                     分成比例
                   </label>
                   <input
@@ -478,16 +788,34 @@ const ResearchManagement = () => {
                     max="100"
                     style={{
                       width: '100%',
-                      padding: '12px',
-                      border: '1px solid #d9d9d9',
-                      borderRadius: '6px',
-                      fontSize: '14px'
+                      padding: '14px 16px',
+                      border: '1px solid rgba(102, 126, 234, 0.2)',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      backdropFilter: 'blur(10px)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#667eea';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(102, 126, 234, 0.2)';
+                      e.target.style.boxShadow = 'none';
                     }}
                   />
                 </div>
                 
                 <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '8px', 
+                    fontWeight: '600',
+                    color: '#2c3e50',
+                    fontSize: '14px'
+                  }}>
                     通道费
                   </label>
                   <input
@@ -497,18 +825,36 @@ const ResearchManagement = () => {
                     placeholder="0"
                     style={{
                       width: '100%',
-                      padding: '12px',
-                      border: '1px solid #d9d9d9',
-                      borderRadius: '6px',
-                      fontSize: '14px'
+                      padding: '14px 16px',
+                      border: '1px solid rgba(102, 126, 234, 0.2)',
+                      borderRadius: '12px',
+                      fontSize: '14px',
+                      background: 'rgba(255, 255, 255, 0.8)',
+                      backdropFilter: 'blur(10px)',
+                      transition: 'all 0.3s ease',
+                      outline: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = '#667eea';
+                      e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = 'rgba(102, 126, 234, 0.2)';
+                      e.target.style.boxShadow = 'none';
                     }}
                   />
                 </div>
               </div>
               
               
-              <div style={{ marginBottom: '30px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
+              <div style={{ marginBottom: '32px' }}>
+                <label style={{ 
+                  display: 'block', 
+                  marginBottom: '8px', 
+                  fontWeight: '600',
+                  color: '#2c3e50',
+                  fontSize: '14px'
+                }}>
                   游戏项目描述
                 </label>
                 <textarea
@@ -518,16 +864,35 @@ const ResearchManagement = () => {
                   placeholder="描述游戏项目的基本信息、特色玩法等..."
                   style={{
                     width: '100%',
-                    padding: '12px',
-                    border: '1px solid #d9d9d9',
-                    borderRadius: '6px',
+                    padding: '14px 16px',
+                    border: '1px solid rgba(102, 126, 234, 0.2)',
+                    borderRadius: '12px',
                     fontSize: '14px',
-                    resize: 'vertical'
+                    background: 'rgba(255, 255, 255, 0.8)',
+                    backdropFilter: 'blur(10px)',
+                    transition: 'all 0.3s ease',
+                    outline: 'none',
+                    resize: 'vertical',
+                    fontFamily: 'inherit'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#667eea';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'rgba(102, 126, 234, 0.2)';
+                    e.target.style.boxShadow = 'none';
                   }}
                 />
               </div>
               
-              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <div style={{ 
+                display: 'flex', 
+                gap: '16px', 
+                justifyContent: 'flex-end',
+                paddingTop: '20px',
+                borderTop: '1px solid rgba(102, 126, 234, 0.1)'
+              }}>
                 <button
                   type="button"
                   onClick={() => {
@@ -536,31 +901,57 @@ const ResearchManagement = () => {
                     resetForm();
                   }}
                   style={{
-                    backgroundColor: '#f5f5f5',
-                    color: '#333',
-                    border: '1px solid #d9d9d9',
+                    background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+                    color: '#495057',
+                    border: '1px solid rgba(102, 126, 234, 0.2)',
                     padding: '12px 24px',
-                    borderRadius: '6px',
+                    borderRadius: '12px',
                     cursor: 'pointer',
-                    fontSize: '14px'
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = 'none';
                   }}
                 >
-                  取消
+                  ❌ 取消
                 </button>
                 <button
                   type="submit"
                   style={{
-                    backgroundColor: '#1890ff',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     color: 'white',
                     border: 'none',
                     padding: '12px 24px',
-                    borderRadius: '6px',
+                    borderRadius: '12px',
                     cursor: 'pointer',
                     fontSize: '14px',
-                    fontWeight: 'bold'
+                    fontWeight: '600',
+                    transition: 'all 0.3s ease',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 6px 16px rgba(102, 126, 234, 0.6)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.4)';
                   }}
                 >
-                  {editingProject ? '更新' : '创建'}
+                  {editingProject ? '✅ 更新项目' : '➕ 创建项目'}
                 </button>
               </div>
             </form>
