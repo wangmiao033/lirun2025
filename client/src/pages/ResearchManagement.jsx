@@ -6,21 +6,17 @@ const ResearchManagement = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
   const [formData, setFormData] = useState({
-    projectCode: '',
     projectName: '',
-    manager: '',
-    projectType: '',
-    budget: '',
-    startDate: '',
-    endDate: '',
+    prepayment: '',
     status: '',
+    revenueShare: '',
+    channelFee: '',
     description: ''
   });
   
   // 搜索和筛选状态
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
-  const [filterType, setFilterType] = useState('');
 
   useEffect(() => {
     fetchResearchProjects();
@@ -72,14 +68,11 @@ const ResearchManagement = () => {
 
   const resetForm = () => {
     setFormData({
-      projectCode: '',
       projectName: '',
-      manager: '',
-      projectType: '',
-      budget: '',
-      startDate: '',
-      endDate: '',
+      prepayment: '',
       status: '',
+      revenueShare: '',
+      channelFee: '',
       description: ''
     });
   };
@@ -87,14 +80,11 @@ const ResearchManagement = () => {
   const handleEdit = (project) => {
     setEditingProject(project);
     setFormData({
-      projectCode: project.projectCode,
       projectName: project.projectName,
-      manager: project.manager,
-      projectType: project.projectType,
-      budget: project.budget?.toString() || '',
-      startDate: project.startDate,
-      endDate: project.endDate,
+      prepayment: project.prepayment?.toString() || '',
       status: project.status,
+      revenueShare: project.revenueShare?.toString() || '',
+      channelFee: project.channelFee?.toString() || '',
       description: project.description
     });
     setShowModal(true);
@@ -142,32 +132,18 @@ const ResearchManagement = () => {
     return statusMap[status] || status;
   };
 
-  const getTypeText = (type) => {
-    const typeMap = {
-      'basic': '基础研究',
-      'applied': '应用研究',
-      'development': '开发研究',
-      'innovation': '创新研究'
-    };
-    return typeMap[type] || type;
-  };
-
   // 筛选逻辑
   const filteredProjects = researchProjects.filter(project => {
     const matchesSearch = !searchTerm || 
-      project.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.projectCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.manager.toLowerCase().includes(searchTerm.toLowerCase());
+      project.projectName.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = !filterStatus || project.status === filterStatus;
-    const matchesType = !filterType || project.projectType === filterType;
     
-    return matchesSearch && matchesStatus && matchesType;
+    return matchesSearch && matchesStatus;
   });
 
-  // 获取唯一的状态和类型
+  // 获取唯一的状态
   const uniqueStatuses = [...new Set(researchProjects.map(p => p.status))];
-  const uniqueTypes = [...new Set(researchProjects.map(p => p.projectType))];
 
   if (loading) {
     return (
@@ -186,7 +162,7 @@ const ResearchManagement = () => {
         alignItems: 'center',
         marginBottom: '30px'
       }}>
-        <h1 style={{ margin: 0, color: '#333' }}>🔬 研发管理</h1>
+        <h1 style={{ margin: 0, color: '#333' }}>🎮 游戏研发管理</h1>
         <button
           onClick={() => setShowModal(true)}
           style={{
@@ -224,7 +200,7 @@ const ResearchManagement = () => {
             </label>
             <input
               type="text"
-              placeholder="搜索项目名称、编号、负责人..."
+              placeholder="搜索游戏项目名称..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{
@@ -259,34 +235,12 @@ const ResearchManagement = () => {
             </select>
           </div>
           
-          <div>
-            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold', fontSize: '14px' }}>
-              🏷️ 类型
-            </label>
-            <select
-              value={filterType}
-              onChange={(e) => setFilterType(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #d9d9d9',
-                borderRadius: '6px',
-                fontSize: '14px'
-              }}
-            >
-              <option value="">全部类型</option>
-              {uniqueTypes.map(type => (
-                <option key={type} value={type}>{getTypeText(type)}</option>
-              ))}
-            </select>
-          </div>
           
           <div>
             <button
               onClick={() => {
                 setSearchTerm('');
                 setFilterStatus('');
-                setFilterType('');
               }}
               style={{
                 backgroundColor: '#f5f5f5',
@@ -319,7 +273,7 @@ const ResearchManagement = () => {
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <h2 style={{ margin: 0, color: '#333' }}>🔬 研发项目列表</h2>
+          <h2 style={{ margin: 0, color: '#333' }}>🎮 游戏项目列表</h2>
           <div style={{ 
             fontSize: '14px', 
             color: '#666',
@@ -340,12 +294,11 @@ const ResearchManagement = () => {
           }}>
             <thead>
               <tr style={{ backgroundColor: '#f8f9fa' }}>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>项目编号</th>
                 <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>项目名称</th>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>负责人</th>
-                <th style={{ padding: '16px', textAlign: 'left', borderBottom: '1px solid #e9ecef' }}>类型</th>
-                <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>预算</th>
+                <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>预付款</th>
                 <th style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>状态</th>
+                <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>分成比例</th>
+                <th style={{ padding: '16px', textAlign: 'right', borderBottom: '1px solid #e9ecef' }}>通道费</th>
                 <th style={{ padding: '16px', textAlign: 'center', borderBottom: '1px solid #e9ecef' }}>操作</th>
               </tr>
             </thead>
@@ -353,31 +306,10 @@ const ResearchManagement = () => {
               {filteredProjects.map((project) => (
                 <tr key={project.id} style={{ borderBottom: '1px solid #f0f0f0' }}>
                   <td style={{ padding: '16px' }}>
-                    <div style={{ fontWeight: 'bold', color: '#1890ff' }}>{project.projectCode}</div>
-                  </td>
-                  <td style={{ padding: '16px' }}>
-                    <div>
-                      <div style={{ fontWeight: 'bold' }}>{project.projectName}</div>
-                      <div style={{ fontSize: '12px', color: '#666' }}>
-                        {project.startDate} - {project.endDate}
-                      </div>
-                    </div>
-                  </td>
-                  <td style={{ padding: '16px' }}>{project.manager}</td>
-                  <td style={{ padding: '16px' }}>
-                    <span style={{
-                      padding: '4px 8px',
-                      borderRadius: '4px',
-                      fontSize: '12px',
-                      backgroundColor: '#e6f7ff',
-                      color: '#1890ff',
-                      border: '1px solid #91d5ff'
-                    }}>
-                      {getTypeText(project.projectType)}
-                    </span>
+                    <div style={{ fontWeight: 'bold', color: '#1890ff' }}>{project.projectName}</div>
                   </td>
                   <td style={{ padding: '16px', textAlign: 'right', fontWeight: 'bold', color: '#52c41a' }}>
-                    ¥{project.budget?.toLocaleString()}
+                    ¥{project.prepayment?.toLocaleString() || '0'}
                   </td>
                   <td style={{ padding: '16px', textAlign: 'center' }}>
                     <span style={{
@@ -390,6 +322,12 @@ const ResearchManagement = () => {
                     }}>
                       {getStatusText(project.status)}
                     </span>
+                  </td>
+                  <td style={{ padding: '16px', textAlign: 'right', fontWeight: 'bold', color: '#1890ff' }}>
+                    {project.revenueShare || '0'}%
+                  </td>
+                  <td style={{ padding: '16px', textAlign: 'right', fontWeight: 'bold', color: '#fa8c16' }}>
+                    ¥{project.channelFee?.toLocaleString() || '0'}
                   </td>
                   <td style={{ padding: '16px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
@@ -454,40 +392,21 @@ const ResearchManagement = () => {
             overflow: 'auto'
           }}>
             <h2 style={{ margin: '0 0 20px 0', color: '#333' }}>
-              {editingProject ? '编辑研发项目' : '新增研发项目'}
+              {editingProject ? '编辑游戏项目' : '新增游戏项目'}
             </h2>
             
             <form onSubmit={handleSubmit}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
+              <div style={{ marginBottom: '20px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    项目编号 *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.projectCode}
-                    onChange={(e) => setFormData({...formData, projectCode: e.target.value})}
-                    required
-                    placeholder="如：RD2025001"
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      border: '1px solid #d9d9d9',
-                      borderRadius: '6px',
-                      fontSize: '14px'
-                    }}
-                  />
-                </div>
-                
-                <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    项目名称 *
+                    游戏项目名称 *
                   </label>
                   <input
                     type="text"
                     value={formData.projectName}
                     onChange={(e) => setFormData({...formData, projectName: e.target.value})}
                     required
+                    placeholder="如：王者荣耀、和平精英"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -502,57 +421,13 @@ const ResearchManagement = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    负责人 *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.manager}
-                    onChange={(e) => setFormData({...formData, manager: e.target.value})}
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      border: '1px solid #d9d9d9',
-                      borderRadius: '6px',
-                      fontSize: '14px'
-                    }}
-                  />
-                </div>
-                
-                <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    项目类型 *
-                  </label>
-                  <select
-                    value={formData.projectType}
-                    onChange={(e) => setFormData({...formData, projectType: e.target.value})}
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '12px',
-                      border: '1px solid #d9d9d9',
-                      borderRadius: '6px',
-                      fontSize: '14px'
-                    }}
-                  >
-                    <option value="">请选择类型</option>
-                    <option value="basic">基础研究</option>
-                    <option value="applied">应用研究</option>
-                    <option value="development">开发研究</option>
-                    <option value="innovation">创新研究</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
-                <div>
-                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    预算
+                    预付款
                   </label>
                   <input
                     type="number"
-                    value={formData.budget}
-                    onChange={(e) => setFormData({...formData, budget: e.target.value})}
+                    value={formData.prepayment}
+                    onChange={(e) => setFormData({...formData, prepayment: e.target.value})}
+                    placeholder="0"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -592,12 +467,15 @@ const ResearchManagement = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    开始日期
+                    分成比例
                   </label>
                   <input
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) => setFormData({...formData, startDate: e.target.value})}
+                    type="number"
+                    value={formData.revenueShare}
+                    onChange={(e) => setFormData({...formData, revenueShare: e.target.value})}
+                    placeholder="0"
+                    min="0"
+                    max="100"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -610,12 +488,13 @@ const ResearchManagement = () => {
                 
                 <div>
                   <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                    结束日期
+                    通道费
                   </label>
                   <input
-                    type="date"
-                    value={formData.endDate}
-                    onChange={(e) => setFormData({...formData, endDate: e.target.value})}
+                    type="number"
+                    value={formData.channelFee}
+                    onChange={(e) => setFormData({...formData, channelFee: e.target.value})}
+                    placeholder="0"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -627,14 +506,16 @@ const ResearchManagement = () => {
                 </div>
               </div>
               
+              
               <div style={{ marginBottom: '30px' }}>
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>
-                  项目描述
+                  游戏项目描述
                 </label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   rows="3"
+                  placeholder="描述游戏项目的基本信息、特色玩法等..."
                   style={{
                     width: '100%',
                     padding: '12px',

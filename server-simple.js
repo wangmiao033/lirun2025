@@ -344,31 +344,34 @@ let suppliers = [
   }
 ];
 
-// 模拟数据库 - 研发项目数据
+// 模拟数据库 - 游戏研发项目数据
 let researchProjects = [
   {
     id: 1,
-    projectCode: 'RD2025001',
-    projectName: '新游戏引擎开发',
-    manager: '张三',
-    projectType: 'development',
-    budget: 500000,
-    startDate: '2025-01-01',
-    endDate: '2025-12-31',
+    projectName: '王者荣耀',
+    prepayment: 1000000,
     status: 'active',
-    description: '开发下一代游戏引擎'
+    revenueShare: 70,
+    channelFee: 50000,
+    description: '5V5英雄公平对战手游，腾讯最受欢迎的游戏之一'
   },
   {
     id: 2,
-    projectCode: 'RD2025002',
-    projectName: 'AI算法优化',
-    manager: '李四',
-    projectType: 'applied',
-    budget: 300000,
-    startDate: '2025-02-01',
-    endDate: '2025-08-31',
-    status: 'planning',
-    description: '优化游戏AI算法'
+    projectName: '和平精英',
+    prepayment: 800000,
+    status: 'active',
+    revenueShare: 65,
+    channelFee: 40000,
+    description: '腾讯光子工作室群自研反恐军事竞赛体验手游'
+  },
+  {
+    id: 3,
+    projectName: '原神',
+    prepayment: 2000000,
+    status: 'completed',
+    revenueShare: 80,
+    channelFee: 100000,
+    description: '米哈游开发的开放世界冒险RPG游戏'
   }
 ];
 
@@ -1053,9 +1056,9 @@ app.get('/api/research-projects', (req, res) => {
 });
 
 app.post('/api/research-projects', (req, res) => {
-  const { projectCode, projectName, manager, projectType, budget, startDate, endDate, status, description } = req.body;
+  const { projectName, prepayment, status, revenueShare, channelFee, description } = req.body;
   
-  if (!projectCode || !projectName || !manager || !projectType || !status) {
+  if (!projectName || !status) {
     return res.status(400).json({
       success: false,
       message: '缺少必填字段'
@@ -1064,14 +1067,11 @@ app.post('/api/research-projects', (req, res) => {
   
   const newProject = {
     id: researchProjects.length + 1,
-    projectCode,
     projectName,
-    manager,
-    projectType,
-    budget: budget ? parseFloat(budget) : 0,
-    startDate: startDate || '',
-    endDate: endDate || '',
+    prepayment: prepayment ? parseFloat(prepayment) : 0,
     status,
+    revenueShare: revenueShare ? parseFloat(revenueShare) : 0,
+    channelFee: channelFee ? parseFloat(channelFee) : 0,
     description: description || ''
   };
   
@@ -1080,7 +1080,7 @@ app.post('/api/research-projects', (req, res) => {
   res.json({
     success: true,
     data: newProject,
-    message: '研发项目创建成功'
+    message: '游戏项目创建成功'
   });
 });
 
@@ -1098,7 +1098,9 @@ app.put('/api/research-projects/:id', (req, res) => {
   researchProjects[projectIndex] = {
     ...researchProjects[projectIndex],
     ...req.body,
-    budget: req.body.budget ? parseFloat(req.body.budget) : researchProjects[projectIndex].budget
+    prepayment: req.body.prepayment ? parseFloat(req.body.prepayment) : researchProjects[projectIndex].prepayment,
+    revenueShare: req.body.revenueShare ? parseFloat(req.body.revenueShare) : researchProjects[projectIndex].revenueShare,
+    channelFee: req.body.channelFee ? parseFloat(req.body.channelFee) : researchProjects[projectIndex].channelFee
   };
   
   res.json({
