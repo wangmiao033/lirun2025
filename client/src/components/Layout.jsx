@@ -44,6 +44,11 @@ const Layout = ({ children }) => {
           icon: '📺',
           label: '渠道管理',
         },
+        {
+          key: '/games',
+          icon: '🎮',
+          label: '游戏管理',
+        },
       ]
     },
     {

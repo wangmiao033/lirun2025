@@ -12,6 +12,7 @@ import DepartmentManagement from './pages/DepartmentManagement';
 import SupplierManagement from './pages/SupplierManagement';
 import ResearchManagement from './pages/ResearchManagement';
 import ChannelManagement from './pages/ChannelManagement';
+import GameManagement from './pages/GameManagement';
 import DataImport from './pages/DataImport';
 import Reports from './pages/Reports';
 
@@ -31,6 +32,7 @@ const App = () => {
           <Route path="/suppliers" element={<SupplierManagement />} />
           <Route path="/research" element={<ResearchManagement />} />
           <Route path="/channels" element={<ChannelManagement />} />
+          <Route path="/games" element={<GameManagement />} />
           <Route path="/import" element={<DataImport />} />
           <Route path="/reports" element={<Reports />} />
         </Routes>
