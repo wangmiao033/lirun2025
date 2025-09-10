@@ -1287,6 +1287,78 @@ app.get('/api/advertising-statistics', (req, res) => {
   });
 });
 
+// 导出广告费数据
+app.get('/api/advertising-fees/export', (req, res) => {
+  try {
+    const XLSX = require('xlsx');
+    
+    // 准备导出数据
+    const exportData = advertisingFees.map(ad => ({
+      '活动名称': ad.campaignName,
+      '平台': ad.platform,
+      '广告类型': ad.adType,
+      '目标受众': ad.targetAudience,
+      '预算': ad.budget,
+      '已花费': ad.spent,
+      '剩余预算': ad.remaining,
+      '开始日期': ad.startDate,
+      '结束日期': ad.endDate,
+      '状态': ad.status,
+      '项目': ad.project,
+      '曝光量': ad.impressions,
+      '点击量': ad.clicks,
+      '转化量': ad.conversions,
+      'CTR(%)': ad.ctr,
+      'CPC(元)': ad.cpc,
+      'CPA(元)': ad.cpa,
+      '描述': ad.description
+    }));
+    
+    // 创建工作簿
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    
+    // 设置列宽
+    const colWidths = [
+      { wch: 20 }, // 活动名称
+      { wch: 12 }, // 平台
+      { wch: 12 }, // 广告类型
+      { wch: 15 }, // 目标受众
+      { wch: 10 }, // 预算
+      { wch: 10 }, // 已花费
+      { wch: 10 }, // 剩余预算
+      { wch: 12 }, // 开始日期
+      { wch: 12 }, // 结束日期
+      { wch: 8 },  // 状态
+      { wch: 12 }, // 项目
+      { wch: 12 }, // 曝光量
+      { wch: 10 }, // 点击量
+      { wch: 10 }, // 转化量
+      { wch: 8 },  // CTR
+      { wch: 8 },  // CPC
+      { wch: 8 },  // CPA
+      { wch: 30 }  // 描述
+    ];
+    ws['!cols'] = colWidths;
+    
+    XLSX.utils.book_append_sheet(wb, ws, '广告费数据');
+    
+    // 生成Excel文件
+    const excelBuffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+    
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="广告费数据_${new Date().toISOString().split('T')[0]}.xlsx"`);
+    res.send(excelBuffer);
+    
+  } catch (error) {
+    console.error('导出广告费数据失败:', error);
+    res.status(500).json({
+      success: false,
+      message: '导出失败'
+    });
+  }
+});
+
 // Excel文件上传和解析
 app.post('/api/upload', upload.single('file'), (req, res) => {
   if (!req.file) {
