@@ -1007,6 +1007,24 @@ app.get('/api/projects', (req, res) => {
   });
 });
 
+// 为了兼容性，也提供 /api/profits 端点
+app.get('/api/profits', (req, res) => {
+  // 返回关联游戏信息的项目
+  const projectsWithGames = projects.map(project => {
+    const game = games.find(g => g.id === project.gameId);
+    return {
+      ...project,
+      game: game || null
+    };
+  });
+  
+  res.json({
+    success: true,
+    data: projectsWithGames,
+    total: projectsWithGames.length
+  });
+});
+
 // 获取单个项目数据
 app.get('/api/projects/:id', (req, res) => {
   const id = parseInt(req.params.id);
@@ -2391,6 +2409,89 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
       message: '文件解析失败: ' + error.message
     });
   }
+});
+
+// 备份管理API
+app.get('/api/backups', (req, res) => {
+  // 模拟备份数据
+  const backups = [
+    {
+      id: 'backup_1',
+      filename: 'backup_1.json',
+      createdAt: new Date('2024-12-01'),
+      size: 1024 * 50, // 50KB
+      status: 'success'
+    },
+    {
+      id: 'backup_2',
+      filename: 'backup_2.json',
+      createdAt: new Date('2024-12-05'),
+      size: 1024 * 75, // 75KB
+      status: 'success'
+    }
+  ];
+  
+  res.json({
+    success: true,
+    data: backups
+  });
+});
+
+app.post('/api/backups', (req, res) => {
+  const backupId = `backup_${Date.now()}`;
+  const newBackup = {
+    id: backupId,
+    filename: `${backupId}.json`,
+    createdAt: new Date(),
+    size: 1024 * 60, // 60KB
+    status: 'success'
+  };
+  
+  res.json({
+    success: true,
+    data: newBackup,
+    message: '备份创建成功'
+  });
+});
+
+app.get('/api/backups/:id/download', (req, res) => {
+  const { id } = req.params;
+  
+  // 模拟备份数据
+  const backupData = {
+    timestamp: new Date().toISOString(),
+    version: '1.0.0',
+    data: {
+      projects: projects,
+      servers: servers,
+      bankAccounts: bankAccounts,
+      // 其他数据...
+    }
+  };
+  
+  res.setHeader('Content-Type', 'application/json');
+  res.setHeader('Content-Disposition', `attachment; filename=${id}.json`);
+  res.json(backupData);
+});
+
+app.post('/api/backups/:id/restore', (req, res) => {
+  const { id } = req.params;
+  
+  // 模拟恢复操作
+  res.json({
+    success: true,
+    message: '备份恢复成功'
+  });
+});
+
+app.delete('/api/backups/:id', (req, res) => {
+  const { id } = req.params;
+  
+  // 模拟删除操作
+  res.json({
+    success: true,
+    message: '备份删除成功'
+  });
 });
 
 // 获取统计数据
