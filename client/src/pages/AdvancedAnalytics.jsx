@@ -16,7 +16,7 @@ const AdvancedAnalytics = () => {
 
   const loadData = async () => {
     await handleApiCall(async () => {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/profits');
       const data = await response.json();
       if (data.success) {
         setProjects(data.data);
@@ -26,9 +26,9 @@ const AdvancedAnalytics = () => {
   };
 
   const calculateAnalytics = (data) => {
-    const revenue = data.map(p => p.companyRevenue);
-    const costs = data.map(p => p.costTotal);
-    const profits = data.map(p => p.grossProfit);
+    const revenue = data.map(p => p.revenue);
+    const costs = data.map(p => p.cost);
+    const profits = data.map(p => p.profit);
 
     const analytics = {
       revenue: {

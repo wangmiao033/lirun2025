@@ -72,6 +72,16 @@ const Sidebar = () => {
       icon: '📈',
       label: '报表分析',
     },
+    {
+      key: '/analytics',
+      icon: '📊',
+      label: '高级分析',
+    },
+    {
+      key: '/backup',
+      icon: '💾',
+      label: '数据备份',
+    },
   ];
 
   const handleMenuClick = (key) => {
