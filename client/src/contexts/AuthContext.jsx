@@ -11,24 +11,45 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // 设置默认管理员用户信息，无需登录
+  const [user, setUser] = useState({
+    id: 1,
+    username: 'admin',
+    email: 'admin@company.com',
+    role: 'admin',
+    department: '管理部',
+    isActive: true,
+    lastLogin: new Date().toISOString().split('T')[0],
+    profile: {
+      firstName: '系统',
+      lastName: '管理员',
+      phone: '13800138000',
+      avatar: ''
+    },
+    permissions: [
+      { module: 'dashboard', actions: ['read', 'write'] },
+      { module: 'projects', actions: ['read', 'write', 'delete'] },
+      { module: 'servers', actions: ['read', 'write', 'delete'] },
+      { module: 'bank', actions: ['read', 'write', 'delete'] },
+      { module: 'prepayments', actions: ['read', 'write', 'delete'] },
+      { module: 'advertising', actions: ['read', 'write', 'delete'] },
+      { module: 'channels', actions: ['read', 'write', 'delete'] },
+      { module: 'suppliers', actions: ['read', 'write', 'delete'] },
+      { module: 'research', actions: ['read', 'write', 'delete'] },
+      { module: 'reports', actions: ['read', 'write', 'delete'] },
+      { module: 'users', actions: ['read', 'write', 'delete'] },
+      { module: 'departments', actions: ['read', 'write', 'delete'] },
+      { module: 'games', actions: ['read', 'write', 'delete'] },
+      { module: 'billing', actions: ['read', 'write', 'delete'] },
+      { module: 'backups', actions: ['read', 'write', 'delete'] },
+      { module: 'data-import', actions: ['read', 'write', 'delete'] },
+      { module: 'advanced-analytics', actions: ['read', 'write', 'delete'] }
+    ]
+  });
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // 检查localStorage中是否有用户信息
-    const token = localStorage.getItem('token');
-    const userData = localStorage.getItem('user');
-    
-    if (token && userData) {
-      try {
-        setUser(JSON.parse(userData));
-      } catch (error) {
-        console.error('解析用户数据失败:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      }
-    }
-    
+    // 直接设置用户为已登录状态，无需检查token
     setLoading(false);
   }, []);
 
@@ -45,10 +66,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const hasPermission = (module, action) => {
-    if (!user) return false;
-    if (user.role === 'admin') return true;
+    // 管理员拥有所有权限
+    if (user && user.role === 'admin') return true;
     
-    const permission = user.permissions?.find(p => p.module === module);
+    const permission = user?.permissions?.find(p => p.module === module);
     return permission?.actions?.includes(action) || false;
   };
 

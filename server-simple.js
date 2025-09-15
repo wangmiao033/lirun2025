@@ -817,29 +817,24 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// 获取当前用户信息
-app.get('/api/auth/me', auth, (req, res) => {
+// 获取当前用户信息（移除认证要求）
+app.get('/api/auth/me', (req, res) => {
   try {
-    const user = users.find(u => u.id === req.user.userId);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: '用户不存在'
-      });
-    }
-
+    // 返回默认管理员用户信息
+    const defaultUser = users[0]; // 管理员用户
+    
     res.json({
       success: true,
       data: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-        department: user.department,
-        isActive: user.isActive,
-        lastLogin: user.lastLogin,
-        profile: user.profile,
-        permissions: user.permissions
+        id: defaultUser.id,
+        username: defaultUser.username,
+        email: defaultUser.email,
+        role: defaultUser.role,
+        department: defaultUser.department,
+        isActive: defaultUser.isActive,
+        lastLogin: defaultUser.lastLogin,
+        profile: defaultUser.profile,
+        permissions: defaultUser.permissions
       }
     });
   } catch (error) {
@@ -851,17 +846,10 @@ app.get('/api/auth/me', auth, (req, res) => {
   }
 });
 
-// 获取所有用户（管理员）
-app.get('/api/users', auth, (req, res) => {
+// 获取所有用户（移除认证要求）
+app.get('/api/users', (req, res) => {
   try {
-    const user = users.find(u => u.id === req.user.userId);
-    if (user.role !== 'admin') {
-      return res.status(403).json({
-        success: false,
-        message: '权限不足'
-      });
-    }
-
+    // 直接返回所有用户信息，无需权限检查
     const userList = users.map(u => ({
       id: u.id,
       username: u.username,
