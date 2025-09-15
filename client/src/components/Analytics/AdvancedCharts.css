@@ -1,0 +1,190 @@
+.advanced-charts {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.chart-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.chart-controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.chart-controls select {
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.chart-controls select:focus {
+  outline: none;
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+}
+
+.chart-controls select:hover {
+  border-color: #40a9ff;
+}
+
+.chart-container {
+  margin-bottom: 20px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chart-insights {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.chart-insights h4 {
+  margin: 0 0 12px 0;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.insight-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e8e8e8;
+}
+
+.insight-item .label {
+  font-weight: 500;
+  color: #666;
+  font-size: 14px;
+}
+
+.insight-item .value {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+.insight-item .value.trend-上升 {
+  color: #52c41a;
+}
+
+.insight-item .value.trend-下降 {
+  color: #ff4d4f;
+}
+
+.insight-item .value.trend-稳定 {
+  color: #1890ff;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .chart-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .chart-controls select {
+    flex: 1;
+    min-width: 120px;
+  }
+  
+  .insights-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 图表动画 */
+.recharts-line .recharts-line-path {
+  transition: all 0.3s ease;
+}
+
+.recharts-bar-rectangle {
+  transition: all 0.3s ease;
+}
+
+.recharts-pie-sector {
+  transition: all 0.3s ease;
+}
+
+/* 工具提示样式 */
+.recharts-tooltip-wrapper {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid #e8e8e8 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.recharts-tooltip-label {
+  font-weight: 600 !important;
+  color: #333 !important;
+}
+
+.recharts-tooltip-item {
+  color: #666 !important;
+}
+
+/* 图例样式 */
+.recharts-legend-wrapper {
+  padding-top: 16px !important;
+}
+
+.recharts-legend-item {
+  margin-right: 16px !important;
+}
+
+/* 坐标轴样式 */
+.recharts-xAxis .recharts-text {
+  font-size: 12px;
+  fill: #666;
+}
+
+.recharts-yAxis .recharts-text {
+  font-size: 12px;
+  fill: #666;
+}
+
+/* 网格线样式 */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: #f0f0f0;
+  stroke-width: 1;
+}
