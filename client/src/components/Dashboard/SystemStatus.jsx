@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import StatCard from '../UI/StatCard';
+import './SystemStatus.css';
 
 const SystemStatus = ({ serverStats, fundStats, statistics }) => {
   const [systemHealth, setSystemHealth] = useState({

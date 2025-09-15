@@ -1,5 +1,5 @@
-/* 导入主题样式 */
-@import './styles/theme.css';
+/* 导入主题样式 - 暂时禁用以防构建问题 */
+/* @import url('./styles/theme.css'); */
 
 body {
   margin: 0;
@@ -8,8 +8,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg-secondary);
-  color: var(--text-primary);
+  background-color: #f5f5f5;
+  color: #333;
 }
 
 code {

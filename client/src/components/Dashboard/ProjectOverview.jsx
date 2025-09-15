@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import './ProjectOverview.css';
 
 const ProjectOverview = ({ projectStats, loading }) => {
   const navigate = useNavigate();

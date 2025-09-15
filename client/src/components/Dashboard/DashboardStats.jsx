@@ -1,5 +1,6 @@
 import React from 'react';
 import StatCard from '../UI/StatCard';
+import './DashboardStats.css';
 
 const DashboardStats = ({ statistics, loading }) => {
   const formatCurrency = (amount) => {

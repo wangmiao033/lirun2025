@@ -1,6 +1,6 @@
 {
   "name": "profit-management-system",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "公司内部利润管理系统",
   "main": "server-simple.js",
   "scripts": {
