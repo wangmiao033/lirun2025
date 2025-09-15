@@ -8,6 +8,7 @@ import NotificationContainer from './components/NotificationContainer';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import DashboardMinimal from './pages/Dashboard.minimal';
 import ProfitManagement from './pages/ProfitManagement';
 import ServerManagement from './pages/ServerManagement';
 import BankManagement from './pages/BankManagement';
@@ -24,6 +25,7 @@ import Reports from './pages/Reports';
 import AdvancedAnalytics from './pages/AdvancedAnalytics';
 import BackupManagement from './pages/BackupManagement';
 import Test from './pages/Test';
+import SimpleTest from './pages/SimpleTest';
 
 const App = () => {
   return (
@@ -33,12 +35,13 @@ const App = () => {
           <Router>
             <Routes>
               <Route path="/test" element={<Test />} />
+              <Route path="/simple-test" element={<SimpleTest />} />
               <Route path="/login" element={<Login />} />
               <Route path="/" element={
                 <Layout>
                   <Routes>
                     <Route index element={<Navigate to="/dashboard" replace />} />
-                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="dashboard" element={<DashboardMinimal />} />
                     <Route path="profits" element={<ProfitManagement />} />
                     <Route path="servers" element={<ServerManagement />} />
                     <Route path="bank" element={<BankManagement />} />
