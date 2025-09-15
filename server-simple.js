@@ -2658,10 +2658,12 @@ app.get('/api/export', (req, res) => {
 
 // 静态文件服务（仅在构建后可用）
 if (process.env.NODE_ENV === 'production') {
+  // 静态文件服务 - 优先使用public目录
+  app.use(express.static(path.join(__dirname, 'public')));
   app.use(express.static(path.join(__dirname, 'client/build')));
 
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
   });
 }
 
