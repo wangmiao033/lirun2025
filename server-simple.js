@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const multer = require('multer');
 const xlsx = require('xlsx');
 const jwt = require('jsonwebtoken');
@@ -2645,11 +2646,21 @@ app.get('/api/export', (req, res) => {
 });
 
 // 静态文件服务 - 在所有环境下都启用
-// 静态文件服务 - 使用React构建文件
+// 首先尝试public目录的静态文件
+app.use(express.static(path.join(__dirname, 'public')));
+// 然后使用React构建文件
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+  // 优先使用public目录的index.html，如果没有则使用build目录
+  const publicIndex = path.join(__dirname, 'public', 'index.html');
+  const buildIndex = path.join(__dirname, 'client/build', 'index.html');
+  
+  if (fs.existsSync(publicIndex)) {
+    res.sendFile(publicIndex);
+  } else {
+    res.sendFile(buildIndex);
+  }
 });
 
 app.listen(PORT, () => {
