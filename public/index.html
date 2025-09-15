@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>利润管理系统</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        color: #333;
+        padding: 20px;
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        padding: 40px;
+        backdrop-filter: blur(10px);
+      }
+      
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      
+      .header h1 {
+        font-size: 3rem;
+        color: #1890ff;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+      
+      .header p {
+        font-size: 1.2rem;
+        color: #666;
+      }
+      
+      .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+      }
+      
+      .status-card {
+        background: white;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.3s ease;
+      }
+      
+      .status-card:hover {
+        transform: translateY(-5px);
+      }
+      
+      .status-card h3 {
+        color: #666;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+      }
+      
+      .status-card .value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      
+      .status-card.revenue .value {
+        color: #52c41a;
+      }
+      
+      .status-card.cost .value {
+        color: #faad14;
+      }
+      
+      .status-card.profit .value {
+        color: #f5222d;
+      }
+      
+      .status-card.projects .value {
+        color: #1890ff;
+      }
+      
+      .navigation {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+      }
+      
+      .navigation h2 {
+        color: #333;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      
+      .nav-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+      
+      .nav-item {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 20px;
+        text-align: center;
+        text-decoration: none;
+        color: #495057;
+        transition: all 0.3s ease;
+        font-weight: 500;
+      }
+      
+      .nav-item:hover {
+        background: #1890ff;
+        color: white;
+        border-color: #1890ff;
+        transform: translateY(-2px);
+      }
+      
+      .info-box {
+        background: #e6f7ff;
+        border: 1px solid #91d5ff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+      }
+      
+      .info-box h3 {
+        color: #1890ff;
+        margin-bottom: 10px;
+      }
+      
+      .info-box p {
+        color: #666;
+        line-height: 1.6;
+      }
+      
+      .loading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+      }
+      
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #1890ff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .current-time {
+        text-align: center;
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>📊 利润管理系统</h1>
+        <p>企业财务数据分析与管理平台</p>
+      </div>
+      
+      <div class="status-grid">
+        <div class="status-card projects">
+          <h3>总项目数</h3>
+          <div class="value">25</div>
+          <p>活跃项目</p>
+        </div>
+        
+        <div class="status-card revenue">
+          <h3>总收入</h3>
+          <div class="value">¥1,250,000</div>
+          <p>本月收入</p>
+        </div>
+        
+        <div class="status-card cost">
+          <h3>总成本</h3>
+          <div class="value">¥850,000</div>
+          <p>运营成本</p>
+        </div>
+        
+        <div class="status-card profit">
+          <h3>净利润</h3>
+          <div class="value">¥400,000</div>
+          <p>利润率: 32%</p>
+        </div>
+      </div>
+      
+      <div class="navigation">
+        <h2>📋 功能导航</h2>
+        <div class="nav-grid">
+          <a href="/profits" class="nav-item">
+            💰 利润管理
+          </a>
+          <a href="/servers" class="nav-item">
+            🖥️ 服务器管理
+          </a>
+          <a href="/bank" class="nav-item">
+            🏦 银行管理
+          </a>
+          <a href="/advertising" class="nav-item">
+            📢 广告管理
+          </a>
+          <a href="/reports" class="nav-item">
+            📈 报表分析
+          </a>
+          <a href="/analytics" class="nav-item">
+            📊 高级分析
+          </a>
+          <a href="/departments" class="nav-item">
+            🏢 部门管理
+          </a>
+          <a href="/import" class="nav-item">
+            📥 数据导入
+          </a>
+        </div>
+      </div>
+      
+      <div class="info-box">
+        <h3>🔧 系统状态</h3>
+        <p>
+          ✅ 服务器运行正常<br>
+          ✅ 数据库连接正常<br>
+          ✅ API服务正常<br>
+          ✅ 静态文件服务正常<br><br>
+          <strong>当前版本:</strong> v1.8.1<br>
+          <strong>最后更新:</strong> <span id="update-time"></span>
+        </p>
+      </div>
+      
+      <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p>正在加载页面...</p>
+      </div>
+      
+      <div class="current-time">
+        当前时间: <span id="current-time"></span>
+      </div>
+    </div>
+    
+    <script>
+      // 显示当前时间
+      function updateTime() {
+        const now = new Date();
+        document.getElementById('current-time').textContent = now.toLocaleString('zh-CN');
+        document.getElementById('update-time').textContent = now.toLocaleString('zh-CN');
+      }
+      
+      updateTime();
+      setInterval(updateTime, 1000);
+      
+      // 导航点击处理
+      document.querySelectorAll('.nav-item').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const href = this.getAttribute('href');
+          
+          // 显示加载状态
+          document.querySelector('.container').style.display = 'none';
+          document.getElementById('loading').style.display = 'block';
+          
+          // 延迟跳转
+          setTimeout(() => {
+            window.location.href = href;
+          }, 1000);
+        });
+      });
+      
+      // 错误处理
+      window.addEventListener('error', function(e) {
+        console.error('页面错误:', e);
+        document.querySelector('.container').innerHTML = `
+          <div class="header">
+            <h1>❌ 系统错误</h1>
+            <p>页面加载时出现错误</p>
+          </div>
+          <div class="info-box">
+            <h3>错误信息:</h3>
+            <p>${e.message}</p>
+            <p>请刷新页面重试，或联系技术支持。</p>
+          </div>
+        `;
+      });
+      
+      // 页面加载完成
+      console.log('静态版本页面加载完成');
+    </script>
+  </body>
+</html>
