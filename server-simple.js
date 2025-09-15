@@ -2644,15 +2644,13 @@ app.get('/api/export', (req, res) => {
   }
 });
 
-// 静态文件服务（仅在构建后可用）
-if (process.env.NODE_ENV === 'production') {
-  // 静态文件服务 - 使用React构建文件
-  app.use(express.static(path.join(__dirname, 'client/build')));
+// 静态文件服务 - 在所有环境下都启用
+// 静态文件服务 - 使用React构建文件
+app.use(express.static(path.join(__dirname, 'client/build')));
 
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
-  });
-}
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+});
 
 app.listen(PORT, () => {
   console.log(`服务器运行在端口 ${PORT}`);
