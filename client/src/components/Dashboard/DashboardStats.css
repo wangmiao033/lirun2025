@@ -1,0 +1,24 @@
+.dashboard-stats {
+  margin-bottom: var(--spacing-xl);
+}
+
+.dashboard-stats .stat-card {
+  min-height: 160px;
+}
+
+/* 响应式调整 */
+@media (max-width: 1200px) {
+  .dashboard-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-stats .stat-card {
+    min-height: 140px;
+  }
+}
