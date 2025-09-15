@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useApiError } from '../hooks/useApiError';
 import { statistics, trendAnalysis, forecasting, correlation, anomalyDetection } from '../utils/analytics';
-import AdvancedCharts from '../components/Analytics/AdvancedCharts';
-import KeyMetrics from '../components/Analytics/KeyMetrics';
-import SmartFilters from '../components/Analytics/SmartFilters';
 import './AdvancedAnalytics.css';
 
 const AdvancedAnalytics = () => {
   const [projects, setProjects] = useState([]);
-  const [filteredProjects, setFilteredProjects] = useState([]);
-  const [comparisonProjects, setComparisonProjects] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [selectedMetric, setSelectedMetric] = useState('revenue');
   const [forecastPeriods, setForecastPeriods] = useState(6);
-  const [chartType, setChartType] = useState('composed');
   const { handleApiCall, loading, error } = useApiError();
 
   useEffect(() => {
@@ -26,19 +20,12 @@ const AdvancedAnalytics = () => {
       const data = await response.json();
       if (data.success) {
         setProjects(data.data);
-        setFilteredProjects(data.data);
         calculateAnalytics(data.data);
       }
     });
   };
 
-  const handleFilteredData = (filtered, comparison) => {
-    setFilteredProjects(filtered);
-    setComparisonProjects(comparison);
-    calculateAnalytics(filtered, comparison);
-  };
-
-  const calculateAnalytics = (data, comparisonData = null) => {
+  const calculateAnalytics = (data) => {
     const revenue = data.map(p => p.revenue || 0);
     const costs = data.map(p => p.cost || 0);
     const profits = data.map(p => p.profit || 0);
@@ -90,34 +77,6 @@ const AdvancedAnalytics = () => {
       profits: anomalyDetection.zScore(profits)
     };
 
-    // 对比分析
-    if (comparisonData) {
-      const compRevenue = comparisonData.map(p => p.revenue || 0);
-      const compCosts = comparisonData.map(p => p.cost || 0);
-      const compProfits = comparisonData.map(p => p.profit || 0);
-
-      analytics.comparison = {
-        revenue: {
-          current: statistics.mean(revenue),
-          previous: statistics.mean(compRevenue),
-          growth: statistics.mean(compRevenue) > 0 ? 
-            ((statistics.mean(revenue) - statistics.mean(compRevenue)) / statistics.mean(compRevenue)) * 100 : 0
-        },
-        costs: {
-          current: statistics.mean(costs),
-          previous: statistics.mean(compCosts),
-          growth: statistics.mean(compCosts) > 0 ? 
-            ((statistics.mean(costs) - statistics.mean(compCosts)) / statistics.mean(compCosts)) * 100 : 0
-        },
-        profits: {
-          current: statistics.mean(profits),
-          previous: statistics.mean(compProfits),
-          growth: statistics.mean(compProfits) > 0 ? 
-            ((statistics.mean(profits) - statistics.mean(compProfits)) / statistics.mean(compProfits)) * 100 : 0
-        }
-      };
-    }
-
     setAnalytics(analytics);
   };
 
@@ -131,40 +90,33 @@ const AdvancedAnalytics = () => {
         <p>深度洞察业务数据，发现隐藏的商业机会</p>
       </div>
 
-      {/* 智能筛选器 */}
-      <SmartFilters 
-        data={projects} 
-        onFilteredData={handleFilteredData}
-      />
-
-      {/* 关键指标 */}
-      <KeyMetrics data={filteredProjects} />
-
-      {/* 图表分析 */}
-      <div className="charts-section">
-        <div className="charts-header">
-          <h2>📈 可视化分析</h2>
-          <div className="chart-controls">
-            <select 
-              value={chartType} 
-              onChange={(e) => setChartType(e.target.value)}
-            >
-              <option value="composed">综合图表</option>
-              <option value="line">趋势线图</option>
-              <option value="area">面积图</option>
-              <option value="bar">柱状图</option>
-              <option value="pie">饼图</option>
-              <option value="scatter">散点图</option>
-            </select>
+      {/* 数据概览 */}
+      <div className="data-overview">
+        <h2>数据概览</h2>
+        <div className="overview-grid">
+          <div className="overview-card">
+            <h3>总项目数</h3>
+            <p className="overview-value">{projects.length}</p>
+          </div>
+          <div className="overview-card">
+            <h3>总收入</h3>
+            <p className="overview-value">
+              ¥{projects.reduce((sum, p) => sum + (p.revenue || 0), 0).toLocaleString()}
+            </p>
+          </div>
+          <div className="overview-card">
+            <h3>总成本</h3>
+            <p className="overview-value">
+              ¥{projects.reduce((sum, p) => sum + (p.cost || 0), 0).toLocaleString()}
+            </p>
+          </div>
+          <div className="overview-card">
+            <h3>总利润</h3>
+            <p className="overview-value">
+              ¥{projects.reduce((sum, p) => sum + (p.profit || 0), 0).toLocaleString()}
+            </p>
           </div>
         </div>
-        
-        <AdvancedCharts 
-          data={filteredProjects} 
-          type={chartType}
-          title="业务趋势分析"
-          height={400}
-        />
       </div>
 
       {/* 详细分析 */}
@@ -265,52 +217,13 @@ const AdvancedAnalytics = () => {
               </div>
             </div>
 
-            {/* 对比分析 */}
-            {analytics.comparison && (
-              <div className="comparison-section">
-                <h3>对比分析</h3>
-                <div className="comparison-grid">
-                  <div className="comparison-item">
-                    <div className="comparison-label">收入对比</div>
-                    <div className="comparison-values">
-                      <span>当前: {analytics.comparison.revenue.current.toLocaleString()}</span>
-                      <span>对比: {analytics.comparison.revenue.previous.toLocaleString()}</span>
-                      <span className={`growth ${analytics.comparison.revenue.growth >= 0 ? 'positive' : 'negative'}`}>
-                        {analytics.comparison.revenue.growth >= 0 ? '+' : ''}{analytics.comparison.revenue.growth.toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
-                  <div className="comparison-item">
-                    <div className="comparison-label">成本对比</div>
-                    <div className="comparison-values">
-                      <span>当前: {analytics.comparison.costs.current.toLocaleString()}</span>
-                      <span>对比: {analytics.comparison.costs.previous.toLocaleString()}</span>
-                      <span className={`growth ${analytics.comparison.costs.growth >= 0 ? 'positive' : 'negative'}`}>
-                        {analytics.comparison.costs.growth >= 0 ? '+' : ''}{analytics.comparison.costs.growth.toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
-                  <div className="comparison-item">
-                    <div className="comparison-label">利润对比</div>
-                    <div className="comparison-values">
-                      <span>当前: {analytics.comparison.profits.current.toLocaleString()}</span>
-                      <span>对比: {analytics.comparison.profits.previous.toLocaleString()}</span>
-                      <span className={`growth ${analytics.comparison.profits.growth >= 0 ? 'positive' : 'negative'}`}>
-                        {analytics.comparison.profits.growth >= 0 ? '+' : ''}{analytics.comparison.profits.growth.toFixed(1)}%
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* 异常检测 */}
             <div className="anomaly-section">
               <h3>异常检测</h3>
               <div className="anomaly-list">
                 {analytics.anomalies[selectedMetric]
                   .filter(item => item.isAnomaly)
-                  .slice(0, 10) // 只显示前10个异常
+                  .slice(0, 10)
                   .map((item, index) => (
                     <div key={index} className="anomaly-item">
                       <span className="anomaly-index">项目 {item.index + 1}</span>
