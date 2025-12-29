@@ -6,8 +6,18 @@ const multer = require('multer');
 const xlsx = require('xlsx');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const http = require('http');
+const { Server } = require('socket.io');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
 const PORT = process.env.PORT || 5000;
 
 // 中间件
@@ -2483,6 +2493,75 @@ app.delete('/api/backups/:id', (req, res) => {
   });
 });
 
+// 获取趋势数据
+app.get('/api/trend-data', (req, res) => {
+  try {
+    // 生成过去12个月的趋势数据
+    const trendData = [];
+    const currentDate = new Date();
+    
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+      const month = date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit' });
+      
+      // 模拟数据 - 实际项目中应该从数据库查询
+      const revenue = Math.floor(Math.random() * 500000) + 200000;
+      const cost = Math.floor(revenue * (0.3 + Math.random() * 0.2));
+      const profit = revenue - cost;
+      
+      trendData.push({
+        month,
+        revenue,
+        cost,
+        profit
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: trendData
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '获取趋势数据失败',
+      error: error.message
+    });
+  }
+});
+
+// 获取项目分布数据
+app.get('/api/project-distribution', (req, res) => {
+  try {
+    // 按游戏统计项目分布
+    const distribution = {};
+    
+    projects.forEach(project => {
+      const gameName = project.game?.gameName || '未知游戏';
+      if (!distribution[gameName]) {
+        distribution[gameName] = 0;
+      }
+      distribution[gameName] += 1;
+    });
+    
+    const distributionData = Object.entries(distribution).map(([name, value]) => ({
+      name,
+      value
+    }));
+    
+    res.json({
+      success: true,
+      data: distributionData
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '获取项目分布数据失败',
+      error: error.message
+    });
+  }
+});
+
 // 获取统计数据
 app.get('/api/statistics', (req, res) => {
   const totalRevenue = projects.reduce((sum, p) => sum + p.companyRevenue, 0);
@@ -2645,25 +2724,163 @@ app.get('/api/export', (req, res) => {
   }
 });
 
-// 静态文件服务 - 在所有环境下都启用
-// 首先尝试public目录的静态文件
-app.use(express.static(path.join(__dirname, 'public')));
-// 然后使用React构建文件
+// 静态文件服务 - 优先使用React构建文件
+// 首先使用React构建文件（包含所有静态资源）
 app.use(express.static(path.join(__dirname, 'client/build')));
+// 然后使用public目录的静态文件（作为备用）
+app.use(express.static(path.join(__dirname, 'public')));
 
+// 所有路由都返回React应用的index.html（支持前端路由）
 app.get('*', (req, res) => {
-  // 优先使用public目录的index.html，如果没有则使用build目录
-  const publicIndex = path.join(__dirname, 'public', 'index.html');
+  // 优先使用React构建的index.html
   const buildIndex = path.join(__dirname, 'client/build', 'index.html');
+  const publicIndex = path.join(__dirname, 'public', 'index.html');
   
-  if (fs.existsSync(publicIndex)) {
+  if (fs.existsSync(buildIndex)) {
+    res.sendFile(buildIndex);
+  } else if (fs.existsSync(publicIndex)) {
+    // 如果没有构建文件，使用public目录的index.html作为备用
     res.sendFile(publicIndex);
   } else {
-    res.sendFile(buildIndex);
+    res.status(404).send('页面未找到，请先构建前端应用');
   }
 });
 
-app.listen(PORT, () => {
+// WebSocket连接处理
+io.on('connection', (socket) => {
+  console.log('用户连接:', socket.id);
+
+  // 加入房间
+  socket.on('join_room', (room) => {
+    socket.join(room);
+    console.log(`用户 ${socket.id} 加入房间 ${room}`);
+  });
+
+  // 离开房间
+  socket.on('leave_room', (room) => {
+    socket.leave(room);
+    console.log(`用户 ${socket.id} 离开房间 ${room}`);
+  });
+
+  // 实时数据更新
+  socket.on('request_data_update', (data) => {
+    const { type, room } = data;
+    
+    // 根据类型获取最新数据
+    let responseData = null;
+    switch (type) {
+      case 'projects':
+        responseData = projects;
+        break;
+      case 'statistics':
+        responseData = {
+          totalProjects: projects.length,
+          totalRevenue: projects.reduce((sum, p) => sum + (p.revenue || 0), 0),
+          totalCost: projects.reduce((sum, p) => sum + (p.cost || 0), 0),
+          totalProfit: projects.reduce((sum, p) => sum + (p.profit || 0), 0)
+        };
+        break;
+      case 'trend_data':
+        responseData = generateTrendData();
+        break;
+      case 'project_distribution':
+        responseData = generateProjectDistribution();
+        break;
+    }
+
+    if (responseData) {
+      socket.emit('data_update', {
+        type: type,
+        data: responseData,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // 广播数据变更
+  socket.on('broadcast_change', (data) => {
+    const { room, type, change } = data;
+    socket.to(room).emit('data_changed', {
+      type: type,
+      change: change,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // 发送通知
+  socket.on('send_notification', (notification) => {
+    const { room, message, type = 'info' } = notification;
+    io.to(room).emit('notification', {
+      id: Date.now(),
+      message: message,
+      type: type,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  // 用户断开连接
+  socket.on('disconnect', () => {
+    console.log('用户断开连接:', socket.id);
+  });
+});
+
+// 生成趋势数据
+function generateTrendData() {
+  const trendData = [];
+  const currentDate = new Date();
+
+  for (let i = 11; i >= 0; i--) {
+    const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+    const month = date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit' });
+
+    const revenue = Math.floor(Math.random() * 500000) + 200000;
+    const cost = Math.floor(revenue * (0.3 + Math.random() * 0.2));
+    const profit = revenue - cost;
+
+    trendData.push({
+      month,
+      revenue,
+      cost,
+      profit
+    });
+  }
+
+  return trendData;
+}
+
+// 生成项目分布数据
+function generateProjectDistribution() {
+  const distribution = {};
+
+  projects.forEach(project => {
+    const gameName = project.game?.gameName || '未知游戏';
+    if (!distribution[gameName]) {
+      distribution[gameName] = 0;
+    }
+    distribution[gameName] += 1;
+  });
+
+  return Object.entries(distribution).map(([name, value]) => ({
+    name,
+    value
+  }));
+}
+
+// 定期广播系统状态
+setInterval(() => {
+  const systemStatus = {
+    timestamp: new Date().toISOString(),
+    totalConnections: io.engine.clientsCount,
+    memoryUsage: process.memoryUsage(),
+    uptime: process.uptime()
+  };
+  
+  io.emit('system_status', systemStatus);
+}, 30000); // 每30秒发送一次
+
+// 启动服务器
+server.listen(PORT, () => {
   console.log(`服务器运行在端口 ${PORT}`);
   console.log(`访问地址: http://localhost:${PORT}`);
+  console.log(`WebSocket服务已启动`);
 });
